@@ -1,4 +1,4 @@
-# HyGene.jl: Hypothesis Generation (HyGene) Model
+# Hypothesis Generation (HyGene) Model
 
 A Julia implementation of a model of diagnostic hypothesis generation ("HyGene") and decision-making[^thomas2008][^thomas2014]. The overall model is based off of Minerva 2[^hintzman1986] and Minerva-DM[^dougherty1999].
 
