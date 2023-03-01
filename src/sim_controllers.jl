@@ -205,7 +205,11 @@ end
 conditional_echo_intensity(probe::Observation,trace::HyGeneModel) = conditional_echo_intensity(probe.content,trace.long_term_memory,trace.act_thresh)
 
 """
-    obs_to_trace
+    obs_to_trace(obs::Observation, decay)
+
+Converts observations to traces by reading the content of an `Observation` object, degrading
+the vector contents with probability `decay`, and creating a new `Trace` object with the 
+altered vector. Mostly to assist formation of `long_term_memory` in the `HyGeneModel` object.
 """
 function obs_to_trace(obs::Observation, decay)
     vals = (obs.label,obs.n_values,obs.n_contexts,0)

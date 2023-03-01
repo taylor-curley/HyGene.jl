@@ -27,11 +27,11 @@ context_labels = ["cough","sneeze","fever","aches"]
 contexts = [Context(x,sim.n_values) for x in context_labels]
 
 # Construct the following observations using 2 contexts:
-#   ["fever","cough"] -> ["flu"]    x2
-#   ["fever","aches"] -> ["flu"]    x2
-#   ["sneeze","aches"] -> ["flu"]   x2
-#   ["sneeze","cough"] -> ["cold"]  x3
-#   ["cough","sneeze"] -> ["cold"]  x3
+#       ["fever","cough"] -> ["flu"]    x2
+#       ["fever","aches"] -> ["flu"]    x2
+#       ["sneeze","aches"] -> ["flu"]   x2
+#       ["sneeze","cough"] -> ["cold"]  x3
+#       ["cough","sneeze"] -> ["cold"]  x3
 obs_vecs1 = [[3,1,2,"flu1"],
              [3,4,2,"flu2"],
              [2,4,2,"flu3"]]
@@ -58,7 +58,7 @@ sim.semantic_memory = hypotheses
 sim.long_term_memory = traces
 
 # Define new observation with blank hypothesis
-#   ["fever","aches"] -> [?]
+#       ["fever","aches"] -> [?]
 new_content = [contexts[3].content,contexts[4].content,zeros(sim.n_values)]
 new_obs = Observation("new",sim.n_values,sim.n_contexts,new_content)
 
