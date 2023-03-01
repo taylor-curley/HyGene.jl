@@ -40,6 +40,10 @@ A raw, unaltered version of an observed event is recorded as an `Observation`. T
 
 _Here is a description of the functions defined in `./src/sim_controllers.jl`._
 
+## Example
+
+A short, albeit incomplete example is available in `./model/example.jl`. 
+
 # Footnotes and References
 
 [^thomas2008]:
