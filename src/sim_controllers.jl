@@ -210,9 +210,50 @@ conditional_echo_intensity(probe::Observation,trace::HyGeneModel) = conditional_
 Converts observations to traces by reading the content of an `Observation` object, degrading
 the vector contents with probability `decay`, and creating a new `Trace` object with the 
 altered vector. Mostly to assist formation of `long_term_memory` in the `HyGeneModel` object.
+
+# Arguments
+
+  - `obs`: An object of type `Observation`.
+  - `decay`: Float value between `0` and `1` indicating the degree to which an item should decay. 
+
+# Returns
+
+  - Object of type `Trace` with an item vector degraded with probability `decay`.
+
 """
-function obs_to_trace(obs::Observation, decay)
+function obs_to_trace(obs::Observation, decay::Real)
     vals = (obs.label,obs.n_values,obs.n_contexts,0)
     trace = trace_decay(obs.content, decay)
     return Trace(vals..., trace)
+end
+
+
+"""
+    trace_replicator(trace::Vector{<:Real}, similarity::Real)
+    trace_replicator(trace::HypothesisGeneration, similarity::Real)
+
+Copies an item vector with probability `similarity` to a new object. Non-similar features are
+randomly given a new value, i.e. `[-1,0,1]`.
+
+# Arguments
+
+  - `trace`: Either an item vector or simulation object containing an item vector.
+  - `similarity`: Degree of similarity between original and new item vectors.
+
+# Returns
+
+  - `out`: Replicated object with an imperfect copy of the original item vector.
+
+"""
+function trace_replicator(trace::Vector{<:Real}, similarity::Real)
+    out = deepcopy(trace)
+    for i in 1:length(out)
+        rand() < similarity ? (out[i] = sample([-1.0,0.0,1.0])) : nothing
+    end
+    return out
+end
+function trace_replicator(trace::HypothesisGeneration, similarity::Real)
+    out = deepcopy(trace)
+    out.content = trace_replicator(trace.content, similarity)
+    return out
 end
