@@ -5,7 +5,7 @@
 cd(@__DIR__)
 using Pkg 
 # use package environment
-Pkg.activate(".")
+Pkg.activate("..")
 using HyGene, StatsBase, Random
 
 
@@ -64,6 +64,3 @@ new_obs = Observation("new",sim.n_values,sim.n_contexts,new_content)
 
 # Return echo intensity
 new_obs_I = echo_intensity(new_obs, sim.long_term_memory)
-
-# Return conditional echo intensity
-new_obs_c_I = conditional_echo_intensity(new_obs, sim)

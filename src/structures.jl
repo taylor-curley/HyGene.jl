@@ -65,11 +65,11 @@ Base.@kwdef mutable struct HyGeneModel <: HypothesisGeneration
     act_min_h = 0.0
     t = 0
     # Static stores
-    contexts = []
-    semantic_memory = []
+    contexts = Vector{Context}(undef,0)
+    semantic_memory = Vector{Hypothesis}(undef,0)
     # Variable stores
-    working_memory = []
-    long_term_memory = []
+    working_memory = Vector{HypothesisGeneration}(undef,0)
+    long_term_memory = Vector{Trace}(undef,0)
 end
 
 

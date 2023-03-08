@@ -11,6 +11,7 @@ For now, selection of 0, -1, and 1 are selected with equal probability (33%).
 
   - `n_values`: Length of feature mini-vectors.
   - `n_contexts`: Number of mini-vectors within a single item.
+  - `n_items`: Number of items to generate. Note that using `generate_item` to create lists will create items with no similarity to each other.
 
 # Returns
 
@@ -21,11 +22,15 @@ generate_item(n_values::Integer) = Vector{Float64}(sample([-1.0,0.0,1.0],n_value
 function generate_item(n_values::Integer, n_contexts::Integer)
     return [generate_item(n_values) for _ in 1:n_contexts]
 end
+function generate_item(n_values::Integer, n_contexts::Integer, n_items::Integer)
+    return [generate_item(n_values, n_contexts) for _ in 1:n_items]
+end
 
 
 
 """
     trace_decay(vector::Vector{<:Real}, decay<:AbstractFloat)
+    trace_decay(vector::Vector{Vector{<:Real}}, decay::AbstractFloat)
 
 General function that changes each number within a vector by probability `decay`.
 Mostly used in conjunction with the `trace_decay!` append function.
@@ -89,12 +94,14 @@ function trace_decay!(model::HyGeneModel)
 end
 
 """
-    trace_similarity(probe::Vector{<:Real},trace::Vector{<:Real})
-    trace_similarity(probe::Vector{<:Real},trace::Vector{<:Vector{<:Real}})
-    trace_similarity(probe::Vector{<:Vector{<:Real}},trace::Vector{<:Vector{<:Real}})
-    trace_similarity(probe::Vector{<:Vector{<:Real}},trace::HypothesisGeneration)
-    trace_similarity(probe::Vector{<:Vector{<:Real}},trace::Vector{<:HypothesisGeneration})
-    trace_similarity(probe::HypothesisGeneration,trace::HypothesisGeneration)
+    trace_similarity(probe::Vector{<:Real}, trace::Vector{<:Real})
+    trace_similarity(probe::Vector{<:Real}, trace::Vector{<:Vector{<:Real}})
+    trace_similarity(probe::Vector{<:Vector{<:Real}}, trace::Vector{<:Vector{<:Real}})
+    trace_similarity(probe::Vector{<:Vector{<:Real}}, trace::HypothesisGeneration)
+    trace_similarity(probe::HypothesisGeneration, trace::Vector{<:HypothesisGeneration})
+    trace_similarity(probe::Vector{<:Real}, trace::Vector{<:HypothesisGeneration})
+    trace_similarity(probe::Vector{<:Vector{<:Real}}, trace::Vector{<:HypothesisGeneration})
+    trace_similarity(probe::HypothesisGeneration, trace::HypothesisGeneration)
 
 Calculates the similarity between a probe item and a trace. Eq 1 in Thomas et al. (2008).
 Several potential inputs have been proposed using Julia's multiple dispatch capabilities.
@@ -129,6 +136,13 @@ function trace_similarity(probe::Vector{<:Vector{<:Real}},trace::Vector{<:Vector
 end
 trace_similarity(probe::Vector{<:Vector{<:Real}},trace::HypothesisGeneration) = trace_similarity(probe,trace.content)
 trace_similarity(probe::HypothesisGeneration,trace::Vector{<:HypothesisGeneration}) = trace_similarity(probe.content,trace)
+function trace_similarity(probe::Vector{<:Real},trace::Vector{<:HypothesisGeneration})
+    out = []
+    for item in trace
+        push!(out, trace_similarity(probe,item.content))
+    end
+    return out
+end
 function trace_similarity(probe::Vector{<:Vector{<:Real}},trace::Vector{<:HypothesisGeneration})
     out = []
     for item in trace
@@ -187,33 +201,7 @@ echo_intensity(probe,trace) = sum(trace_activation(probe,trace))
 
 
 """
-    conditional_echo_intensity(probe,trace,threshold)
-
-Returns the conditional echo intensity for a set of items that exceed a given activation
-threshold. Eq. 5 in Thomas et al. (2008).
-
-# Arguments
-
-  - `probe`: An input vector or collection of minivectors.
-  - `trace`: A vector or collection of minivectors to be compared against the probe.
-
-"""
-function conditional_echo_intensity(probe,trace,threshold)
-    acts = trace_activation(probe,trace)
-    valid_acts = findall(x -> x > threshold, acts)
-    if isempty(valid_acts)
-        return 0.0
-    elseif length(valid_acts) == 1
-        return acts[valid_acts]^3
-    else
-        return echo_intensity(probe,trace[valid_acts]) / length(valid_acts)
-    end
-    return 
-end
-conditional_echo_intensity(probe::Observation,trace::HyGeneModel) = conditional_echo_intensity(probe.content,trace.long_term_memory,trace.act_thresh)
-
-"""
-    obs_to_trace(obs::Observation, decay)
+    obs_to_trace(obs::Observation, decay::Real)
 
 Converts observations to traces by reading the content of an `Observation` object, degrading
 the vector contents with probability `decay`, and creating a new `Trace` object with the 
@@ -267,13 +255,82 @@ function trace_replicator(trace::HypothesisGeneration, similarity::Real)
 end
 
 """
-    echo_content
+    echo_content(act::Real, trace::Vector{<:Real})
+    echo_content(probe::HypothesisGeneration, store::Vector{<:HypothesisGeneration})
+
+Returns the sum of activation values multiplied against trace item vectors. If the input is a memory store,
+then the values are normalized within each mini-vector.
+
+# Arguments
+
+  - `act`: Activation value to multiply against a given trace vector.
+  - `trace`: Trace vector from a memory store.
+  - `probe`: Input object or vector to compare against memory
+  - `store`: A memory store; usually `HygeneModel.long_term_memory` or `HyGeneModel.semantic_memory`
+
+# Returns
+
+ - Vector or collection of mini-vectors containing echo content.
+
 """
-function echo_content(probe::Vector{<:Real}, memory::Vector{Vector{<:Real}})
-    acts = trace_activation(probe, memory)
-    content = zeros(length(probe))
-    for i in 1:length(acts)
-        content .+= (acts[i] .* memory[i])
+echo_content(act::Real, trace::Vector{<:Real}) = Vector{Float64}(act .* trace)
+function echo_content(act::Real, trace::Vector{<:Vector{<:Real}})
+    out = []
+    for t in trace
+        push!(out, echo_content(act,t))
     end
-    return content
+    return Vector{Vector{Float64}}(out)
+end
+function echo_content(probe::HypothesisGeneration, store::Vector{<:HypothesisGeneration})
+    # Quick input type check
+    (typeof(probe) <: HyGeneModel) ? error("Incorrect specification.") : nothing
+    # Get trace activations
+    acts = trace_activation(probe, store)
+    # Begin echo content collection
+    out = echo_content(acts[1],store[1].content)
+    for (act,trace) in zip(acts[2:end],store[2:end])
+        out .+= echo_content(act,trace.content)
+    end
+    # Normalize within mini-vectors
+    # Make sure values are within [-1.0,1.0]
+    for i in 1:length(out)
+        out[i] ./= maximum(abs.(out[i]))
+        out[i][out[i].>1.0] .= 1.0
+        out[i][out[i].<-1.0] .= -1.0
+    end
+    # Return values
+    if (typeof(probe) <: Trace) | (typeof(probe) <: Observation)
+        return Vector{Vector{Float64}}(out)
+    else
+        return Vector{Float64}(out)
+    end
+end
+
+"""
+    get_contenders!(probe::HypothesisGeneration, model::HyGeneModel)
+
+Populates the Set of Contenders (SoC; or `HyGeneModel.working_memory`) with candidate
+traces greater than the adaptive activation threshold. The procedure ends when the
+number of retrieval failures is greater than `t_max`.
+
+# Arguments
+
+  - `probe`: Information to compare against memory.
+  - `model`: Overall `HyGeneModel` object with items in long-term or semantic memory.
+
+"""
+function get_contenders!(probe::HypothesisGeneration, model::HyGeneModel)
+    model.working_memory = Vector{HypothesisGeneration}(undef,0)                    # Flush working memory store (SoC)
+    model.act_min_h = model.act_min_reset                                           # Reset floating minimum activation threshold
+    model.t = 0                                                                     # Reset retrieval failure count
+    while model.t < model.t_max                                                     # End procedure at max number of retrieval failures
+        trace = sample(1:length(model.long_term_memory))                            # Sample random item from memory store
+        trace_act = trace_activation(probe.content, model.long_term_memory[trace])  # Compare similarity of probe and memory trace
+        if trace_act > model.act_min_h                                              # If the activation of the trace is greater than the floating threshold...
+            push!(model.working_memory, model.long_term_memory[trace])              # copy trace to working memory store...
+            model.act_min_h = trace_act                                             # and set minimum activation value to newly-observed activation.
+        else                                                                        # Otherwise...
+            model.t += 1                                                            # increase the retrieval failure count.
+        end
+    end
 end
