@@ -90,6 +90,7 @@ end
 
 """
     trace_similarity(probe::Vector{<:Real},trace::Vector{<:Real})
+    trace_similarity(probe::Vector{<:Real},trace::Vector{<:Vector{<:Real}})
     trace_similarity(probe::Vector{<:Vector{<:Real}},trace::Vector{<:Vector{<:Real}})
     trace_similarity(probe::Vector{<:Vector{<:Real}},trace::HypothesisGeneration)
     trace_similarity(probe::Vector{<:Vector{<:Real}},trace::Vector{<:HypothesisGeneration})
@@ -110,6 +111,13 @@ You may need to include more as the model evolves.
 
 """
 trace_similarity(probe::Vector{<:Real},trace::Vector{<:Real}) = (probe'trace) / sum((abs.(probe) .+ abs.(trace)).!=0.0)
+function trace_similarity(probe::Vector{<:Real},trace::Vector{<:Vector{<:Real}})
+    out = []
+    for t in trace
+        push!(out, trace_similarity(probe,t))
+    end
+    return Vector{Float64}(out)
+end
 function trace_similarity(probe::Vector{<:Vector{<:Real}},trace::Vector{<:Vector{<:Real}})
     s = 0.0
     n = 0.0
@@ -256,4 +264,16 @@ function trace_replicator(trace::HypothesisGeneration, similarity::Real)
     out = deepcopy(trace)
     out.content = trace_replicator(trace.content, similarity)
     return out
+end
+
+"""
+    echo_content
+"""
+function echo_content(probe::Vector{<:Real}, memory::Vector{Vector{<:Real}})
+    acts = trace_activation(probe, memory)
+    content = zeros(length(probe))
+    for i in 1:length(acts)
+        content .+= (acts[i] .* memory[i])
+    end
+    return content
 end
