@@ -20,7 +20,7 @@ abstract type HypothesisGeneration <: ContinuousUnivariateDistribution end
 
 
 """
-    HyGeneMode
+    HyGeneModel
 
 Mutable structure that holds all parameters and data related to HyGene simulations. 
 This not only includes hyperparameters, but long-term, working, and semantic memory
