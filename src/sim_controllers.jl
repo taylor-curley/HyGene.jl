@@ -27,7 +27,21 @@ function generate_item(n_values::Integer, n_contexts::Integer, n_items::Integer)
 end
 
 """
-    generate_observation
+    generate_observation(label, contexts::Vector{<:Context}, hypothesis::Hypothesis)
+
+High-level constructor of `Observaton` objects given 1 or more contexts and a single
+hypothesis. 
+
+# Arguments
+
+  - `label`: Generic label for the observation.
+  - `contexts`: One or more objects of the `Context` type.
+  - `hypothesis`: A single object of type `Hypothesis`.
+
+# Returns
+
+  - Object of type `Observation`.
+
 """
 function generate_observation(label, contexts::Vector{<:Context}, hypothesis::Hypothesis)
     content = Vector{Vector{Float64}}(undef,0)

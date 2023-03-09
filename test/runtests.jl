@@ -47,8 +47,11 @@ using Test
             hyp = hypotheses[2]
         end
         obs = generate_observation("trace_"*string(i), cont, hyp)
+        @test typeof(obs) <: Observation
         push!(observations, obs)
-        push!(traces, obs_to_trace(obs, decay))
+        trc = obs_to_trace(obs, decay)
+        @test typeof(trc) <: Trace
+        push!(traces, trc)
     end
     model = HyGeneModel(; vars..., 
                         contexts = deepcopy(contexts), 
