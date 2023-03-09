@@ -26,6 +26,18 @@ function generate_item(n_values::Integer, n_contexts::Integer, n_items::Integer)
     return [generate_item(n_values, n_contexts) for _ in 1:n_items]
 end
 
+"""
+    generate_observation
+"""
+function generate_observation(label, contexts::Vector{<:Context}, hypothesis::Hypothesis)
+    content = Vector{Vector{Float64}}(undef,0)
+    for c in contexts
+        push!(content,c.content)
+    end
+    push!(content, hypothesis.content)
+    return Observation(label, length(hypothesis.content), length(contexts), content)
+end
+
 
 """
     trace_decay(vector::Vector{<:Real}, decay<:AbstractFloat)

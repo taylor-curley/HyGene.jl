@@ -47,29 +47,68 @@ stores.
   - `long_term_memory`: Long-term memory store. Basically a vector of `Trace` objects.
 
 """
-Base.@kwdef mutable struct HyGeneModel <: HypothesisGeneration
+mutable struct HyGeneModel <: HypothesisGeneration
     # Descriptive data
-    n_values          = 15
-    n_contexts        = 4
-    n_lt_memory       = 40
-    n_sem_memory      = 40
+    n_values
+    n_contexts
+    n_lt_memory
+    n_sem_memory
     # Static parameters
-    act_thresh        = 0.1
-    similarity        = 0.5
-    decay             = 0.1
-    t_max             = 10
-    ϕ                 = 4
-    act_min_reset     = 0.0
+    act_thresh
+    similarity
+    decay
+    t_max
+    ϕ
+    act_min_reset
     # Variable parameters
-    trial             = 0
-    act_min_h         = 0.0
-    t                 = 0
+    trial
+    act_min_h
+    t 
     # Static stores
-    contexts          = Vector{Context}(undef,0)
-    semantic_memory   = Vector{Hypothesis}(undef,0)
+    contexts
+    semantic_memory
     # Variable stores
-    working_memory    = Vector{HypothesisGeneration}(undef,0)
+    working_memory
+    long_term_memory
+end
+function HyGeneModel(;
+    n_values          = 15,
+    n_contexts        = 4,
+    n_lt_memory       = 40,
+    n_sem_memory      = 40,
+    act_thresh        = 0.1,
+    similarity        = 0.5,
+    decay             = 0.1,
+    t_max             = 10,
+    ϕ                 = 4,
+    act_min_reset     = 0.0,
+    trial             = 0,
+    act_min_h         = 0.0,
+    t                 = 0,
+    contexts          = Vector{Context}(undef,0),
+    semantic_memory   = Vector{Hypothesis}(undef,0),
+    working_memory    = Vector{HypothesisGeneration}(undef,0),
     long_term_memory  = Vector{Trace}(undef,0)
+)
+return HyGeneModel(
+    n_values,
+    n_contexts,
+    n_lt_memory,
+    n_sem_memory,
+    act_thresh,
+    similarity,
+    decay,
+    t_max,
+    ϕ,
+    act_min_reset,
+    trial,
+    act_min_h,
+    t,
+    contexts,
+    semantic_memory,
+    working_memory,
+    long_term_memory
+)
 end
 
 
