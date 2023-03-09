@@ -27,7 +27,6 @@ function generate_item(n_values::Integer, n_contexts::Integer, n_items::Integer)
 end
 
 
-
 """
     trace_decay(vector::Vector{<:Real}, decay<:AbstractFloat)
     trace_decay(vector::Vector{Vector{<:Real}}, decay::AbstractFloat)
@@ -52,7 +51,7 @@ function trace_decay(vector::Vector{<:Real}, decay::AbstractFloat)
     end
     return out
 end
-function trace_decay(vector::Vector{Vector{<:Real}}, decay::AbstractFloat)
+function trace_decay(vector::Vector{<:Vector{<:Real}}, decay::AbstractFloat)
     out = Vector{<:Real}[]
     for minivec in vector
         push!(out, trace_decay(minivec,decay))
@@ -92,6 +91,7 @@ function trace_decay!(model::HyGeneModel)
         trace_decay!(item, model.decay)
     end
 end
+
 
 """
     trace_similarity(probe::Vector{<:Real}, trace::Vector{<:Real})
@@ -153,7 +153,6 @@ end
 trace_similarity(probe::HypothesisGeneration,trace::HypothesisGeneration) = trace_similarity(probe.content,trace.content)
 
 
-
 """
     trace_activation(probe,trace,power=3.0)
 
@@ -179,6 +178,7 @@ function trace_activation(probe,trace,power=3.0)
         return trace_similarity(probe,trace).^power
     end
 end
+
 
 """
     echo_intensity(probe,trace)
@@ -254,6 +254,7 @@ function trace_replicator(trace::HypothesisGeneration, similarity::Real)
     return out
 end
 
+
 """
     echo_content(act::Real, trace::Vector{<:Real})
     echo_content(probe::HypothesisGeneration, store::Vector{<:HypothesisGeneration})
@@ -305,6 +306,7 @@ function echo_content(probe::HypothesisGeneration, store::Vector{<:HypothesisGen
         return Vector{Float64}(out)
     end
 end
+
 
 """
     get_contenders!(probe::HypothesisGeneration, model::HyGeneModel)
