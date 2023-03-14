@@ -5,7 +5,7 @@
 cd(@__DIR__)
 using Pkg 
 # use package environment
-Pkg.activate(".")
+Pkg.activate("..")
 using HyGene, StatsBase, Random
 
 

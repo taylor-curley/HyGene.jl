@@ -38,7 +38,30 @@ A raw, unaltered version of an observed event is recorded as an `Observation`. T
 
 ## Simulation Controllers
 
-_Here is a description of the functions defined in `./src/sim_controllers.jl`._
+There are a number of smaller functions that subserve the overall `HyGene.jl` architecture. They are listed here roughly by their function.
+
+### Object Creation
+
+  - `generate_item`: Returns a vector or collection of minivectors consisting of the integers `-1`, `0`, and `1` sampled with equal probability.
+  - `generate_observation`: Returns an `Observation` object with an observed content vector or collection of minivectors.
+
+### Object Replication
+
+  - `trace_replicator`: Takes vector input and returns a vector with each number replaced with `-1`,`0`, or `1` with probability `similarity` [0.0,1.0].
+  - `trace_decay`: Takes vector input and returns a vector with each number replaced with `0` with probability `decay` [0.0,1.0]. 
+  - `trace_decay!`: Takes a simulation object and degrades the representation vector with probability `decay` [0.0,1.0].
+  - `obs_to_trace`: Takes a "raw" `Observation` object, degrades the content vector with probability `decay`, and returns it within a `Trace` object.
+
+### Object Comparison
+
+  - `trace_similarity`: Calculates the dot product divided by the number of non-zero elements between two content vectors.
+  - `trace_activation`: Calculates `trace_similarity` between two content vectors and raises the result to a given `power`.
+  - `echo_intensity`: Returns the sum of all `trace_activation`s for a given `probe` against all items in a given memory store.
+  - `echo_content`: Calculates `trace_activation` for all items against a `probe`, multiplies the items by their respective activation values, and returns the column sum of the vector or collection of minivectors.
+
+### Object Manipulation
+
+  - `get_contenders!`: Populates the Set of Contenders (i.e., `working_memory` of a `HyGeneSim` object) with `Trace` objects that have activations greater than the moving threshold (`act_min_h`). The operation stops after a certain number of retrieval failures (`t_max`).
 
 ## Example
 
