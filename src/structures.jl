@@ -123,7 +123,8 @@ some level of trace decay. Observations cannot be constructed with null `content
   - `label`: Text label. (Mostly for house-keeping purposes.)
   - `n_values`: Length of feature mini-vectors.
   - `n_contexts`: Number of mini-vectors within a single item.
-  - `content`: Vector (or mini-vectors if `n_features > 1`) of values representing the item.
+  - `data`: Vector (or mini-vectors if `n_features > 1`) of values representing the item features.
+  - `hypothesis`: Vector (or mini-vectors) of values representing the resulting hypothesis.
 
 """
 Base.@kwdef mutable struct Observation <: HypothesisGeneration
@@ -132,7 +133,8 @@ Base.@kwdef mutable struct Observation <: HypothesisGeneration
     n_values
     n_contexts
     # Variable entities
-    content
+    data
+    hypothesis
 end
 
 
@@ -201,7 +203,8 @@ degraded using the `decay` parameter set in `HyGeneModel`.
   - `n_values`: Length of feature mini-vectors.
   - `n_contexts`: Number of mini-vectors within a single item.
   - `last_active`: Trial in which this item was last retrieved. Not useful for base HyGene, but could be useful later on.
-  - `content`: Vector (or mini-vectors if `n_features > 1`) of values representing the item.
+  - `data`: Vector (or mini-vectors if `n_features > 1`) of values representing the item features.
+  - `hypothesis`: Vector (or mini-vectors) of values representing the resulting hypothesis.
 
 """
 Base.@kwdef mutable struct Trace <: HypothesisGeneration
@@ -212,5 +215,6 @@ Base.@kwdef mutable struct Trace <: HypothesisGeneration
     # Variable descriptors
     last_active
     # Variable entities
-    content
+    data
+    hypothesis
 end
