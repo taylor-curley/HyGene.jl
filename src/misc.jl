@@ -8,7 +8,7 @@ Generates blocked headers with centered titles because I got bored.
   - `txt`: String to be included in header
 
 """
-function block_header(txt)
+function block_header(txt::String)
     bar = "###############################################################################################"
     if length(txt)+2 > length(bar)
         error("Text cannot be longer than 93 characters")
@@ -29,7 +29,7 @@ end
   - `len_char`: Length of the title. (OPTIONAL)
 
 """
-function line_header(txt; len_char=93)
+function line_header(txt::String; len_char=93)
     start = Int32(round(len_char/2) - round(length(txt)/2))
     mid_start="#" * repeat("~",start)
     mid_end = repeat("~", len_char-length(mid_start*txt)-1)

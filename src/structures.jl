@@ -175,7 +175,8 @@ constructed with null `content`.
 
   - `label`: Text label. (Mostly for house-keeping purposes.)
   - `n_values`: Length of feature mini-vectors.
-  - `content`: Vector of values of length `n_values`.
+  - `data`: Vector of values of length `n_values`.
+  - `hypothesis`: Vector of values of length `n_values`.
 
 # Constructor
 
@@ -185,10 +186,10 @@ constructed with null `content`.
 Base.@kwdef mutable struct Hypothesis <: HypothesisGeneration
     label
     n_values
-    content
-    # Optional constructor for null content
-    Hypothesis(label,n_values) = new(label,n_values,generate_item(n_values))
+    data
+    hypothesis
 end
+Hypothesis(label, n_values) = Hypothesis(label, n_values, generate_item(n_values), generate_item(n_values))
 
 
 """
