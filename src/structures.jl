@@ -148,7 +148,7 @@ chained together to comprise the content of a Trace.
 
   - `label`: Text label. (Mostly for house-keeping purposes.)
   - `n_values`: Length of feature mini-vectors.
-  - `content`: Vector of values of length `n_values`.
+  - `data`: Vector of values of length `n_values`.
 
 # Constructor
 
@@ -158,10 +158,9 @@ chained together to comprise the content of a Trace.
 Base.@kwdef mutable struct Context <: HypothesisGeneration
     label
     n_values
-    content
-    # Optional constructor for null content
-    Context(label,n_values) = new(label,n_values,generate_item(n_values))
+    data
 end
+Context(label,n_values) = Context(label,n_values,generate_item(n_values))
 
 
 """
