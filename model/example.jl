@@ -1,13 +1,14 @@
 #=============================================================================================
 HYGENE CALCULATION EXAMPLE
 
-@author		: taylor.curley
-@email		: taylor.curley 'at' afrl.af.mil
+@author		: taylor-curley
+@email		: tmc2737 "at" gmail.com
 @date		: 03-27-23
 
 NOTES		
     : Computations follow the example given in the Appendix of the original paper [^1]. 
-    :
+    : Setting the seed should result in a single conditional echo intensity value of ~0.49
+    : for the first ("correct") hypothesis.
     :
     
 REFERENCES
@@ -25,7 +26,7 @@ using Pkg
 Pkg.activate("..")
 using HyGene, StatsBase, Random
 # set seed
-Random.set_seed!(100)
+Random.seed!(100)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Define Hyperparameters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#

@@ -59,13 +59,10 @@ There are a number of smaller functions that subserve the overall `HyGene.jl` ar
   - `echo_intensity`: Returns the sum of all `trace_activation`s for a given `probe` against all items in a given memory store.
   - `echo_content`: Calculates `trace_activation` for all items against a `probe`, multiplies the items by their respective activation values, and returns the column sum of the vector or collection of minivectors.
 
-### Object Manipulation
-
-  - `get_contenders!`: Populates the Set of Contenders (i.e., `working_memory` of a `HyGeneSim` object) with `Trace` objects that have activations greater than the moving threshold (`act_min_h`). The operation stops after a certain number of retrieval failures (`t_max`).
 
 ## Example
 
-A short, albeit incomplete example is available in `./model/example.jl`. 
+A general model of the example from the Appendix of the original paper [^1] is available in `./model/example.jl`. 
 
 # Footnotes and References
 
