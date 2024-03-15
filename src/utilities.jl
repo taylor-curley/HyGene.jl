@@ -21,7 +21,7 @@ julia> create_vec(5)
   1.0
 ```
 """
-create_vec(n_values::Integer) = rand([-1.0,0.0,1.0], n_values)
+create_vec(n_values::Integer) = rand(-1.0:1, n_values)
 
 
 """

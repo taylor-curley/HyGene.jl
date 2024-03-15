@@ -2,7 +2,9 @@ cd(@__DIR__)
 using Pkg 
 # use package environment
 Pkg.activate("..")
-using HyGene, StatsBase, StatsPlots, ProgressMeter, DataFrames, Plots
+using HyGene
+Pkg.activate("")
+using StatsBase, StatsPlots, ProgressMeter, DataFrames, Plots
 
 # SIMULATION 1: THOMAS ET AL. (2008)
 
