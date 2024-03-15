@@ -1,6 +1,9 @@
 # Prelims
-
-using Distributions, StatsBase, StatsPlots, DataFrames
+cd(@__DIR__)
+using Pkg 
+# use package environment
+Pkg.activate("")
+using StatsBase, StatsPlots, ProgressMeter, DataFrames, Plots
 
 create_vec(n_values::Integer) = rand([-1.0,0.0,1.0], n_values)
 
