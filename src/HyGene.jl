@@ -1,7 +1,7 @@
 module HyGene
 
 # Import external libraries
-using Distributions, Parameters, StatsBase, Documenter, DocumenterTools, DataFrames, PrettyTables
+using Distributions, Parameters, StatsBase, PrettyTables
 
 # Structure exports
 export HypothesisGeneration, Model, MemoryStore, Trace, Information, ObsTrace
