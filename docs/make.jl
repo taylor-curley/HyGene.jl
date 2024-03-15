@@ -1,4 +1,5 @@
 using Documenter, HyGene
+push!(LOAD_PATH,"../src/")
 
 makedocs(
     sitename="HyGene.jl",
@@ -14,7 +15,7 @@ makedocs(
     ]
 )
 
-deploydocs(
-    repo = "github.com/taylor-curley/HyGene.jl.git",
-    versions = nothing,
-)
+# deploydocs(
+#     repo = "github.com/taylor-curley/HyGene.jl.git",
+#     versions = nothing,
+# )
