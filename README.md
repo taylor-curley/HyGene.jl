@@ -2,6 +2,9 @@
 
 A Julia implementation of a model of diagnostic hypothesis generation ("HyGene") and decision-making[^thomas2008][^thomas2014]. The overall model is based off of Minerva 2[^hintzman1986] and Minerva-DM[^dougherty1999].
 
+
+More detailed documentation is available [here](https://taylor-curley.github.io/HyGeneDocs/).
+
 ## Types and Structures
 
 `HyGene.jl` simulations are centered upon the structures that hold the data and parameters. The values of each structure (`struct`) can be changes (`mutable`), and each structure belongs to a custom type hierarchy. All types and structures are defined within `./src/structures.jl`.
