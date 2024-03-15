@@ -1,57 +1,14 @@
 # Hypothesis Generation (HyGene)
 
-[![Build Status](https://github.com/taylor-curley/HypothesisGeneration.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/taylor-curley/HypothesisGeneration.jl/actions/workflows/CI.yml?query=branch%3Amaster)
-
 A Julia implementation of a model of diagnostic hypothesis generation ("HyGene") and decision-making[^thomas2008][^thomas2014]. The overall model is based off of Minerva 2[^hintzman1986] and Minerva-DM[^dougherty1999].
 
-## To-do
+## Types and Structures
 
-### Information
+`HyGene.jl` simulations are centered upon the structures that hold the data and parameters. The values of each structure (`struct`) can be changes (`mutable`), and each structure belongs to a custom type hierarchy. All types and structures are defined within `./src/structures.jl`.
 
-- [x] ~~Define high-level containers, like memory stores and information.~~
-- [x] ~~Define `Context` with given number of features.~~
-- [x] ~~Define generic method to build `Context` given certain arguments.~~
-- [x] ~~Define `Trace` in LTM/SM with a given number of contexts.~~
-- [x] ~~Define generic method to build `Trace` given certain arguments.~~
-- [x] ~~Build `trace_replication` function for general vectors.~~
-- [x] ~~Build `trace_replication` function for Context.~~
-- [x] ~~Build `trace_replication` function for `Trace`.~~
-- [x] ~~Build `trace_similarity` function for general vectors.~~
-- [x] ~~Build `trace_similarity` function for `Trace` objects.~~
-- [x] ~~Build `trace_decay!` function for `Context`.~~
-- [x] ~~Build `trace_decay!` function for `Trace`.~~
-- [ ] Write `Information` documentation.
+### `HyGeneModel`
 
-### Long-term Memory
-
-- [x] ~~Define `LongTermMemory` with a given number of episodic traces.~~
-- [x] ~~Define generic method to build `LongTermMemory`~~
-- [x] ~~Build `trace_decay!` function to pass through all items in LTM.~~
-- [ ] Write `LongTermMemory` documentations.
-
-### Semantic Memory
-
-- [x] ~~Define `SemanticMemory` store.~~
-- [x] ~~Define method for extracting unique events from LTM traces to build exemplars.~~
-- [x] ~~Define method for replicating LTM and getting averages of feature vectors for exemplars.~~
-- [ ] ~~Separate information objects for `SemanticMemory` traces?~~
-- [ ] Write `SemanticMemory` documentations.
-
-### Working Memory
-
-- [ ] ~~Define `WorkingMemory` store.~~
-- [ ] ~~Define functions necessary for `WorkingMemory`.~~
-- [x] ~~Define `SetofContenders`.~~
-- [x] ~~Define functions for `SetofContenders`.~~
-- [ ] Write `SetofContenders` documentations.
-
-### Helper functions
-
-- [ ] Write documentation for all helper functions.
-
-### Simulation Handler
-
-- [ ] Define overall model object to house simulations and output.
+This is the main structure within the `HyGene.jl` architecture. It holds all static and dynamic parameters (although `mutable struct`s allow for redefinition), as well as memory stores (long-term, short-term, semantic). Information is written and directly manipulated from this structure. The information vectors that used in the simulations (such as `HyGeneModel.long_term_memory`) are compound vectors, or vectors of vectors. Each minivector represents a context or hypothesis, and several minivectors are chained together to form a larger representation.
 
 # Footnotes and References
 

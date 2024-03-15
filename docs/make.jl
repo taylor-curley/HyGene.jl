@@ -1,4 +1,4 @@
-using Documenter, HypothesisGeneration
+using Documenter, HyGene
 
 makedocs(
     sitename="HyGene.jl",

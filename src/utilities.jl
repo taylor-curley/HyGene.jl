@@ -136,13 +136,13 @@ end
     trace_replication(trace::Information, similarity::Number, decay::Bool=false)
     trace_replication(trace::Trace, similarity::Number, decay::Bool=false)
 
-Returns a degraded replication of a given object under the [`HyGene`](@ref) 
+Returns a degraded replication of a given object under the [HypothesisGeneration`](@ref) 
 hierarchy. The elements of the minivectors within the returned object are chosen 
 from the original minivectors with a probabiliy of `similarity`. Values not
 copied from the original vector are randomly samped from `[-1.0 0.0 1.0]`or 
 assigned `0.0` if you are decaying the trace (`decay==true`)
 
-The following [`HyGene`](@ref) types can be used as the [`Trace`](@ref) object:
+The following [`HypothesisGeneration`](@ref) types can be used as the [`Trace`](@ref) object:
 ```
 Trace
 ├─ Information
@@ -240,7 +240,7 @@ end
     trace_similarity(probe::Information, trace::Information)
     trace_similarity(probe::Trace, trace::Trace)
 
-Calculates the similarity between a probe [`HyGene`](@ref) object and a trace object. 
+Calculates the similarity between a probe [`HypothesisGeneration`](@ref) object and a trace object. 
 If there are multiple [`Context`](@ref) vectors in the `probe` and `trace`, it will recursively
 compute [`trace_similarity`](@ref) for each vector and apply it to the overall `S_i` value.
 
@@ -293,7 +293,7 @@ end
 
 @doc raw"""
     trace_activation(probe::Vector, trace::Vector, exponent::Integer=3)
-    trace_activation(probe::HyGene, trace::HyGene, exponent::Integer=3)
+    trace_activation(probe::HypothesisGeneration, trace::HypothesisGeneration, exponent::Integer=3)
 
 The [`trace_similarity`](@ref) calculation accelerated by an exponent of degree `exponent`, usually 3.
 This is analogous to a cubed cosine similarity. See Eqs 1 and 2 in Thomas et al. (2008) [^1].
@@ -329,7 +329,7 @@ julia> trace_activation(context_a, context_b)
 function trace_activation(probe::Vector{<:Number}, trace::Vector{<:Number}, exponent::Integer=3)
     return trace_similarity(probe, trace) ^ exponent
 end
-function trace_activation(probe::HyGene, trace::HyGene, exponent::Integer=3)
+function trace_activation(probe::HypothesisGeneration, trace::HypothesisGeneration, exponent::Integer=3)
     return trace_similarity(probe,trace) ^ exponent
 end
 
@@ -339,7 +339,7 @@ end
     trace_decay!(trace::Trace, decay::Number)
     trace_decay!(store::MemoryStore, decay::Number)
 
-Returns a [`HyGene`](@ref) object with constituent [`Information`](@ref) vectors of numbers that have been
+Returns a [`HypothesisGeneration`](@ref) object with constituent [`Information`](@ref) vectors of numbers that have been
 copied to the new object with probability `1 - decay`.
 
 # Arguments

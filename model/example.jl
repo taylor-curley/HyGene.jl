@@ -2,7 +2,7 @@ cd(@__DIR__)
 using Pkg 
 # use package environment
 Pkg.activate("..")
-using HypothesisGeneration, StatsBase
+using HyGene, StatsBase
 
 # LTM EXAMPLE: 4 types of unique events w/ 5 instances of each.
 # Each LTM trace consists of 4 information minivectors with 10

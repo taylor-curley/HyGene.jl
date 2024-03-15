@@ -9,7 +9,7 @@ Pages = ["structs.md"]
 ## Abstract Types
 
 ```@docs
-HyGene
+HypothesisGeneration
 Model
 MemoryStore
 Trace

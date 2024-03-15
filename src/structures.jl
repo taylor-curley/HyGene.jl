@@ -1,5 +1,5 @@
 """
-    HyGene <: ContinuousUnivariateDistribution
+    HypothesisGeneration <: ContinuousUnivariateDistribution
 
 An abstract type representing all structures related to HyGene simulations. 
 Mostly useful when using custom samplers, such as with `Turing.jl`, but also
@@ -8,7 +8,7 @@ for preventing excessive function re-definition for different sub-types/structur
 # Type Hierarchy
 
 ```
-HyGene
+HypothesisGeneration
 ├─ MemoryStore
 │  ├─ LongTermMemory
 │  ├─ SemanticMemory
@@ -23,11 +23,11 @@ HyGene
 ```
 
 """
-abstract type HyGene <: ContinuousUnivariateDistribution end
+abstract type HypothesisGeneration <: ContinuousUnivariateDistribution end
 
 
 """
-    Model <: HyGene
+    Model <: HypothesisGeneration
 
 An abstract type representing large simulation objects. The base code only includes one
 `Model` type ([`HyGeneModel`](@ref)), but users can create new objects for bespoke simulations.
@@ -37,11 +37,11 @@ An abstract type representing large simulation objects. The base code only inclu
   - [`HyGeneModel`](@ref)
 
 """
-abstract type Model <: HyGene end
+abstract type Model <: HypothesisGeneration end
 
 
 """
-    MemoryStore <: HyGene
+    MemoryStore <: HypothesisGeneration
 
 An abstract type representing all memory stores.
 
@@ -52,7 +52,7 @@ An abstract type representing all memory stores.
   - [`SetofContenders`](@ref)
 
 """
-abstract type MemoryStore <: HyGene end
+abstract type MemoryStore <: HypothesisGeneration end
 
 
 """
@@ -66,7 +66,7 @@ An abstract type representing chunks of information held in [`MemoryStore`](@ref
   - [`ObsTrace`](@ref)
   
 """
-abstract type Trace <: HyGene end
+abstract type Trace <: HypothesisGeneration end
 
 
 """
@@ -431,7 +431,7 @@ end
 """
     HyGeneModel <: Model
 
-Object holding [`HyGene`](@ref) simulation parameters, variables, and outcomes. The top-level
+Object holding [`HypothesisGeneration`](@ref) simulation parameters, variables, and outcomes. The top-level
 operations that govern the `HyGeneModel` object are located in `sim_controllers.jl`.
 
 # Parameters

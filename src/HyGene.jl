@@ -1,10 +1,10 @@
-module HypothesisGeneration
+module HyGene
 
 # Import external libraries
 using Distributions, Parameters, StatsBase, Documenter, DocumenterTools, DataFrames, PrettyTables
 
 # Structure exports
-export HyGene, Model, MemoryStore, Trace, Information, ObsTrace
+export HypothesisGeneration, Model, MemoryStore, Trace, Information, ObsTrace
 export Context, MemoryTrace, LongTermMemory, SemanticMemory
 export SetofContenders, HyGeneModel
 include("./structures.jl")

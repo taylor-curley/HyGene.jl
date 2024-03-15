@@ -73,7 +73,7 @@ The body of the documentation describes further functionality and boundaries on 
 ```julia
 julia> soc_posterior_prob(new_mod)
 ┌ Warning: There is only 1 contender in the SoC; thus, the probability will always be 1.0.
-└ @ HypothesisGeneration d:\Documents\GitHub\HypothesisGeneration.jl\src\utilities.jl:685
+└ @ HyGene d:\Documents\GitHub\HyGene.jl\src\utilities.jl:685
 1-element Vector{Float64}:
  1.0
 ```

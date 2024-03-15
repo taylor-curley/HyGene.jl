@@ -1,6 +1,6 @@
-using HypothesisGeneration
+using HyGene
 using Test
 
-@testset "HypothesisGeneration.jl" begin
+@testset "HyGene.jl" begin
     # Write your tests here.
 end
