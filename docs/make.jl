@@ -13,3 +13,7 @@ makedocs(
         ]    
     ]
 )
+
+deploydocs(
+    repo = "github.com/taylor-curley/HyGene.jl.git",
+)
