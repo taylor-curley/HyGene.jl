@@ -38,7 +38,7 @@ hypothesis_labels = [:focal, :alt_1, :alt_2, :alt_3, :alt_4, :alt_5, :alt_6, :al
 focal_sim = collect(0.0:0.1:1.0)
 
 # Define trace representation in the "Focal prevalent" condition.
-n_traces = ones(8) * 10
+n_traces = fill(10, 8)
 n_traces[1] = 70
 
 # Define the relative proportion of features shared between LTM traces and their

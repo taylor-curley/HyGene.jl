@@ -469,21 +469,21 @@ operations that govern the `HyGeneModel` object are located in `sim_controllers.
   - `working_memory::SetofContenders`: A single [`SetofContenders`](@ref) object.
 
 """
-@with_kw mutable struct HyGeneModel <: Model
+@with_kw mutable struct HyGeneModel{N<:Int} <: Model
     # Simulation parameters
     A_c::Float64
-    t_max::Integer
+    t_max::N
     focal_similarity::Float64
     encoding_fidelity::Float64
-    n_features::Integer
-    n_unique_contexts::Integer
-    n_unique_events::Integer
-    n_obs_per_event::Any
+    n_features::N
+    n_unique_contexts::N
+    n_unique_events::N
+    n_obs_per_event::Vector{N}
     # Descriptives
     contexts::Vector{Symbol}
     hypotheses::Vector{Symbol}
-    len_ltm::Integer
-    len_sm::Integer
+    len_ltm::N
+    len_sm::N
     prototypes::Vector{<:Trace}
     # Memory stores
     long_term_memory::LongTermMemory
