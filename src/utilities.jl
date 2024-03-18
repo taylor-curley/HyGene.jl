@@ -46,7 +46,7 @@ julia> create_vec(2, 3)
  [0.0, 0.0, -1.0]
 ```
 """
-create_vec(n_vecs::Integer, n_values::Integer) = [create_vec(n_values) for _ in 1:n_vecs]
+create_vec(n_vecs::Integer, n_values::Integer) = [create_vec(n_values) for _ = 1:n_vecs]
 
 
 """
@@ -81,8 +81,8 @@ julia> vecs[1]'vecs[2] / length(vecs[1]) # dot product
 function create_vec(n_vecs::Integer, n_values::Integer, similarity::Number)
     ref = create_vec(n_values)
     out = [ref]
-    for _ in 2:n_vecs
-        push!(out, trace_replication(ref,similarity))
+    for _ = 2:n_vecs
+        push!(out, trace_replication(ref, similarity))
     end
     return out
 end
@@ -117,12 +117,12 @@ julia> trace_replication(vector, 0.5)
  0.0
 ```
 """
-function trace_replication(trace::Vector{<:Number}, similarity::Number, decay::Bool=false)
+function trace_replication(trace::Vector{<:Number}, similarity::Number, decay::Bool = false)
     out = zeros(length(trace))
     for i in eachindex(trace)
         if trace[i] != 0.0
             if rand() > similarity
-                out[i] = decay ? 0.0 : rand([-1.0,0.0,1.0])
+                out[i] = decay ? 0.0 : rand([-1.0, 0.0, 1.0])
             else
                 out[i] = deepcopy(trace[i])
             end
@@ -180,13 +180,13 @@ Context
 ```
 
 """
-function trace_replication(trace::Information, similarity::Number, decay::Bool=false)
+function trace_replication(trace::Information, similarity::Number, decay::Bool = false)
     new_context = deepcopy(trace)
     new_feature_vec = trace_replication(deepcopy(trace.contents), similarity, decay)
     new_context.contents = new_feature_vec
     return new_context
 end
-function trace_replication(trace::Trace, similarity::Number, decay::Bool=false)
+function trace_replication(trace::Trace, similarity::Number, decay::Bool = false)
     new_trace = deepcopy(trace)
     for info in new_trace.contents
         new_contents = trace_replication(deepcopy(info.contents), similarity, decay)
@@ -227,9 +227,13 @@ julia> trace_similarity(a,b)
 [^1]: Thomas, R. P., Dougherty, M. R., Sprenger, A. M., & Harbison, J. (2008). Diagnostic hypothesis generation and human judgment. _Psychological Review, 115_(1), 155-185. https://psycnet.apa.org/doi/10.1037/0033-295X.115.1.155
 """
 function trace_similarity(probe::Vector{<:Number}, trace::Vector{<:Number})
-    length(probe) == length(trace) || throw(DimensionMismatch("the lengths of the probe (n=$(length(probe))) and trace (n=$(length(trace))) vectors must be the same!"))
+    length(probe) == length(trace) || throw(
+        DimensionMismatch(
+            "the lengths of the probe (n=$(length(probe))) and trace (n=$(length(trace))) vectors must be the same!",
+        ),
+    )
     N = length(probe)
-    for (p,t) in zip(probe,trace)
+    for (p, t) in zip(probe, trace)
         (p .== 0.0) && (t .== 0.0) ? N -= 1 : nothing
     end
     return (probe'trace) / float(N)
@@ -282,7 +286,7 @@ julia> trace_similarity(context_a, context_b)
 function trace_similarity(probe::Information, trace::Information)
     return trace_similarity(probe.contents, trace.contents)
 end
-function trace_similarity(probe::Trace, trace::Trace)  
+function trace_similarity(probe::Trace, trace::Trace)
     # Extract contents from both vectors
     probe_contents = getfield.(probe.contents, :contents)
     trace_contents = getfield.(trace.contents, :contents)
@@ -326,11 +330,19 @@ julia> trace_activation(context_a, context_b)
 ```
 
 """
-function trace_activation(probe::Vector{<:Number}, trace::Vector{<:Number}, exponent::Integer=3)
-    return trace_similarity(probe, trace) ^ exponent
+function trace_activation(
+    probe::Vector{<:Number},
+    trace::Vector{<:Number},
+    exponent::Integer = 3,
+)
+    return trace_similarity(probe, trace)^exponent
 end
-function trace_activation(probe::HypothesisGeneration, trace::HypothesisGeneration, exponent::Integer=3)
-    return trace_similarity(probe,trace) ^ exponent
+function trace_activation(
+    probe::HypothesisGeneration,
+    trace::HypothesisGeneration,
+    exponent::Integer = 3,
+)
+    return trace_similarity(probe, trace)^exponent
 end
 
 
@@ -525,8 +537,12 @@ The resulting conditional echo content is given by Eq 7 in Thomas et al. (2008) 
   - `standardized::Bool=true`: Flat that indicates whether or not the echo content should be standardized.
 
 """
-function echo_content(observation::Trace, memory::MemoryStore, 
-                      conditional::Bool=true, standardize::Bool=true)
+function echo_content(
+    observation::Trace,
+    memory::MemoryStore,
+    conditional::Bool = true,
+    standardize::Bool = true,
+)
     # Get activation values first 
     bounce_memory!(observation, memory)
 
@@ -541,7 +557,8 @@ function echo_content(observation::Trace, memory::MemoryStore,
             for context in trace.contents
                 trace_context = deepcopy(context.contents)
                 conditional ? (trace_context .*= trace.A_i) : nothing
-                filter(n -> n.label == context.label, echo.contents)[1].contents += trace_context
+                filter(n -> n.label == context.label, echo.contents)[1].contents +=
+                    trace_context
             end
         end
     end
@@ -590,7 +607,7 @@ function populate_soc!(echo::MemoryTrace, soc::SetofContenders, semantic::Semant
     # Next, extract activation values to serve as sample weights
     # Sanitize the values so that Julia doesn't get mad
     act_weights = getfield.(semantic.contents, :A_i)
-    act_weights[act_weights .< 0.0] .= 0.0
+    act_weights[act_weights.<0.0] .= 0.0
     act_weights = map(x -> isnan(x) ? zero(x) : x, act_weights)
     act_weights ./ sum(act_weights)
     # Iterate through semantic memory
@@ -600,14 +617,14 @@ function populate_soc!(echo::MemoryTrace, soc::SetofContenders, semantic::Semant
         sm_item = sample(semantic.contents)
         # Make sure activation is higher than minimum
         if (sm_item.A_i > soc.act_min) && (sm_item.A_i > 0.0) && (!isnan(sm_item.A_i))
-                # Make sure item is not already in SOC
-                if sm_item.label in [content.label for content in soc.contenders] 
-                    soc.t +=1
-                else
-                    push!(soc.contenders, deepcopy(sm_item))
-                    soc.n_contenders +=1 
-                    soc.act_min = sm_item.A_i
-                end
+            # Make sure item is not already in SOC
+            if sm_item.label in [content.label for content in soc.contenders]
+                soc.t += 1
+            else
+                push!(soc.contenders, deepcopy(sm_item))
+                soc.n_contenders += 1
+                soc.act_min = sm_item.A_i
+            end
         else
             soc.t += 1
         end
@@ -644,7 +661,11 @@ As per Eq. 5 in Thomas et al. (2008) [^1]:
   - `conditional::Bool=true`: Flag to indicate whether the function should return conditional echo intensity. If `false`, then it will only return echo intensity and _not_ conditional echo intensity.
 
 """
-function cond_echo_intensity(probe::MemoryTrace, memory::MemoryStore, conditional::Bool=true)
+function cond_echo_intensity(
+    probe::MemoryTrace,
+    memory::MemoryStore,
+    conditional::Bool = true,
+)
     # Bounce probe off of memory
     bounce_memory!(probe, memory)
     # Extract above-threshold activations
@@ -679,7 +700,7 @@ As per Eq. 8 in Thomas et al. (2008) [^1]:
 
 """
 function soc_posterior_prob(soc::SetofContenders, memory::MemoryStore)
-    if soc.n_contenders == 0 
+    if soc.n_contenders == 0
         @error "There are no leading contenders in the SoC."
     elseif soc.n_contenders == 1
         @warn "There is only 1 contender in the SoC; thus, the probability will always be 1.0."
@@ -689,7 +710,8 @@ function soc_posterior_prob(soc::SetofContenders, memory::MemoryStore)
         return echo_intensity ./ sum(echo_intensity)
     end
 end
-soc_posterior_prob(model::HyGeneModel) = soc_posterior_prob(model.working_memory, model.long_term_memory)
+soc_posterior_prob(model::HyGeneModel) =
+    soc_posterior_prob(model.working_memory, model.long_term_memory)
 
 
 """
@@ -703,10 +725,12 @@ function soc_winner(model::HyGeneModel)
             winner = model.working_memory.contenders[1]
         else
             post_prob = soc_posterior_prob(model.working_memory, model.long_term_memory)
-            winner = model.working_memory.contenders[argmax(getfield.(model.working_memory.contenders, :A_i))]
+            winner = model.working_memory.contenders[argmax(
+                getfield.(model.working_memory.contenders, :A_i),
+            )]
         end
         winner_label = winner.label
-        acc = (obs.label == winner.label)*1
+        acc = (obs.label == winner.label) * 1
     else
         winner = NaN
         winner_label = NaN

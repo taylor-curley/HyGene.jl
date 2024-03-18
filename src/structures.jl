@@ -107,7 +107,7 @@ level of information in the `HypothesisGeneration` environment.
     description::String
     n_features::Integer
     contents::AbstractArray
-    A_i::Float64 
+    A_i::Float64
 end
 
 
@@ -184,7 +184,14 @@ Constructor for a [`MemoryTrace`]@(def) object.
 """
 function MemoryTrace(label::Symbol, description::String, info_vec::Vector{<:Information})
     contexts = Vector([info.label for info in info_vec])
-    return MemoryTrace(label, description, length(info_vec), contexts, deepcopy(info_vec), 0.0)
+    return MemoryTrace(
+        label,
+        description,
+        length(info_vec),
+        contexts,
+        deepcopy(info_vec),
+        0.0,
+    )
 end
 
 
@@ -263,8 +270,8 @@ in [`SemanticMemory`](@ref).
 
 """
 @with_kw mutable struct LongTermMemory <: MemoryStore
-    n_items::Integer 
-    A_c::Float64 
+    n_items::Integer
+    A_c::Float64
     unique_contexts::Vector{Symbol}
     contents::Vector{<:Trace}
 end
@@ -291,7 +298,7 @@ function LongTermMemory(trace_vec::Vector{<:Trace}, A_c::Float64)
         for context in trace.contexts
             push!(contexts, deepcopy(context))
         end
-    end 
+    end
     return LongTermMemory(length(trace_vec), A_c, unique(contexts), trace_vec)
 end
 
@@ -318,7 +325,7 @@ of the contents of the 10 separate traces for each event.
 
 """
 @with_kw mutable struct SemanticMemory <: MemoryStore
-    n_items::Integer 
+    n_items::Integer
     content_labels::Vector{Symbol}
     contents::Vector{<:Trace}
     A_c::Float64
@@ -354,10 +361,12 @@ function SemanticMemory(ltm::LongTermMemory)
         semantic_trace = deepcopy(event_traces[1])
         semantic_trace_contexts = Vector{Context}()
         for context in event_contexts
-            trace_contexts = Vector([filter(n -> n.label == context, trace.contents)[1] for trace in event_traces])
+            trace_contexts = Vector([
+                filter(n -> n.label == context, trace.contents)[1] for trace in event_traces
+            ])
             copy_context = deepcopy(trace_contexts[1])
             context_arrays = Vector([context.contents for context in trace_contexts])
-            mean_contents = sum(context_arrays)./length(context_arrays)
+            mean_contents = sum(context_arrays) ./ length(context_arrays)
             copy_context.contents = mean_contents
             push!(semantic_trace_contexts, copy_context)
         end
@@ -365,7 +374,12 @@ function SemanticMemory(ltm::LongTermMemory)
         standardize_trace!(semantic_trace)
         push!(semantic_trace_vector, semantic_trace)
     end
-    return SemanticMemory(length(semantic_trace_vector), unique_event_tags, semantic_trace_vector, copy(ltm.A_c))
+    return SemanticMemory(
+        length(semantic_trace_vector),
+        unique_event_tags,
+        semantic_trace_vector,
+        copy(ltm.A_c),
+    )
 end
 function SemanticMemory(exemplars::Vector{<:Trace})
     event_tags = [item.label for item in exemplars]
@@ -488,12 +502,20 @@ end
 
 Constructor functions for the [`HyGeneModel`](@ref) object class.
 """
-function HyGeneModel(context_labels::Vector{Symbol}, hypothesis_labels::Vector{Symbol},
-                     n_trace_vec::Vector{<:Number}, A_c::Number=0.2, t_max::Integer=10,
-                     n_features::Integer=15, focal_similarity::Float64=0.0, encoding_fidelity::Float64=0.75)
+function HyGeneModel(
+    context_labels::Vector{Symbol},
+    hypothesis_labels::Vector{Symbol},
+    n_trace_vec::Vector{<:Number},
+    A_c::Number = 0.2,
+    t_max::Integer = 10,
+    n_features::Integer = 15,
+    focal_similarity::Float64 = 0.0,
+    encoding_fidelity::Float64 = 0.75,
+)
 
     # 1. Create prototypes
-    prototypes = create_prototypes(context_labels, hypothesis_labels, n_features, focal_similarity)
+    prototypes =
+        create_prototypes(context_labels, hypothesis_labels, n_features, focal_similarity)
 
     # 2. Create traces and populate memory stores
     traces = create_traces(prototypes, n_trace_vec, encoding_fidelity)
@@ -502,27 +524,64 @@ function HyGeneModel(context_labels::Vector{Symbol}, hypothesis_labels::Vector{S
     wm = SetofContenders(t_max)
 
     # 3. Return model object
-    return HyGeneModel(A_c, t_max, focal_similarity, encoding_fidelity, n_features,
-                      length(context_labels), length(hypothesis_labels), n_trace_vec,
-                      context_labels, hypothesis_labels, length(traces), length(sm.contents),
-                      prototypes, ltm, sm, wm)
+    return HyGeneModel(
+        A_c,
+        t_max,
+        focal_similarity,
+        encoding_fidelity,
+        n_features,
+        length(context_labels),
+        length(hypothesis_labels),
+        n_trace_vec,
+        context_labels,
+        hypothesis_labels,
+        length(traces),
+        length(sm.contents),
+        prototypes,
+        ltm,
+        sm,
+        wm,
+    )
 end
-function HyGeneModel(n_contexts::Integer, n_hypotheses::Integer, n_obs_per_proto::Integer,
-                     A_c::Number=0.2, t_max::Integer=10, n_features::Integer=15,
-                     focal_similarity::Float64=0.0, encoding_fidelity::Float64=0.75)
+function HyGeneModel(
+    n_contexts::Integer,
+    n_hypotheses::Integer,
+    n_obs_per_proto::Integer,
+    A_c::Number = 0.2,
+    t_max::Integer = 10,
+    n_features::Integer = 15,
+    focal_similarity::Float64 = 0.0,
+    encoding_fidelity::Float64 = 0.75,
+)
     # Create label and numeric vectors
     context_labels = create_labels(n_contexts, "context_")
     hypothesis_labels = create_labels(n_hypotheses, "hypothesis_")
-    n_trace_vec = ones(n_hypotheses)*n_obs_per_proto
+    n_trace_vec = ones(n_hypotheses) * n_obs_per_proto
     # Pass to higher function
-    HyGeneModel(context_labels, hypothesis_labels, n_trace_vec, A_c, t_max,
-    n_features, focal_similarity, encoding_fidelity)
+    HyGeneModel(
+        context_labels,
+        hypothesis_labels,
+        n_trace_vec,
+        A_c,
+        t_max,
+        n_features,
+        focal_similarity,
+        encoding_fidelity,
+    )
 end
 
 function StatsBase.describe(hygene::HyGeneModel)
-    out = ["A_c"    hygene.A_c    "Activation threshold \nin long-term memory.";
-           "t_max"  hygene.t_max  "Maximum number of \nretrieval failures."]
+    out = [
+        "A_c" hygene.A_c "Activation threshold \nin long-term memory."
+        "t_max" hygene.t_max "Maximum number of \nretrieval failures."
+    ]
     header = ["Param.", "Value", "Description"]
 
-    return pretty_table(out, linebreaks=true, body_hlines = [1,2], header = header, alignment = :l)
+    return pretty_table(
+        out,
+        linebreaks = true,
+        body_hlines = [1, 2],
+        header = header,
+        alignment = :l,
+    )
 end
