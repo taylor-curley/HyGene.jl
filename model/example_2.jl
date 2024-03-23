@@ -311,3 +311,7 @@ plot(
     plot_title = "Number of Contenders",
     xlabel = "S",
 )
+
+
+# sim_mod =
+#     HyGeneModel(context_labels, hypothesis_labels, n_traces, 0.4, 10, n_features, 0.5, 0.4)
