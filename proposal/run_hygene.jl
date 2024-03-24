@@ -95,7 +95,7 @@ true_semantic_activation = [0.7491, 0.0825, 0.0787]
 
 @test semantic_activation ≈ true_semantic_activation atol = 1e-4
 
-retrieval_probs = normalize!(semantic_activation, 0.0)
+retrieval_probs = normalize(semantic_activation)
 true_retrieval_probs = [0.8229, 0.0906, 0.0864]
 @test retrieval_probs ≈ true_retrieval_probs atol = 1e-4
 
@@ -105,5 +105,88 @@ echo_intensities =
 
 @test echo_intensities ≈ [0.742, 0.196, 0.267] atol = 1e-3
 
+compute_cond_echo_intensity(activations, hypotheses, semantic_probes[:, 3], threshold);
 
-compute_cond_echo_intensity(activations, hypotheses, semantic_probes[:,3], threshold);
+model = Hygene(;
+    t_max = 5,
+    κ = 4,
+    ρ = 0.85,
+    τ = 0.21,
+    data_map = (; f1 = 1:9),
+    hypothesis_map = (; h = 10:18),
+    episodic_memory = [traces; hypotheses],
+    semantic_memory,
+    working_memory = Int[],
+)
+
+n_fails = 0
+semantic_activation = [0.7, 0.3]
+τₛ = 0.0
+idx = 2
+n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
+@test n_fails == 0
+@test τₛ == 0.30
+@test model.working_memory == [2]
+
+
+model = Hygene(;
+    t_max = 5,
+    κ = 4,
+    ρ = 0.85,
+    τ = 0.21,
+    data_map = (; f1 = 1:9),
+    hypothesis_map = (; h = 10:18),
+    episodic_memory = [traces; hypotheses],
+    semantic_memory,
+    working_memory = [2],
+)
+n_fails = 0
+semantic_activation = [0.7, 0.3]
+τₛ = 0.3
+idx = 2
+n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
+@test n_fails == 1
+@test τₛ == 0.30
+@test model.working_memory == [2]
+
+
+model = Hygene(;
+    t_max = 5,
+    κ = 4,
+    ρ = 0.85,
+    τ = 0.21,
+    data_map = (; f1 = 1:9),
+    hypothesis_map = (; h = 10:18),
+    episodic_memory = [traces; hypotheses],
+    semantic_memory,
+    working_memory = [2],
+)
+n_fails = 0
+semantic_activation = [0.7, 0.3]
+τₛ = 0.3
+idx = 1
+n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
+@test n_fails == 0
+@test τₛ == 0.30
+@test model.working_memory == [2, 1]
+
+
+model = Hygene(;
+    t_max = 5,
+    κ = 1,
+    ρ = 0.85,
+    τ = 0.21,
+    data_map = (; f1 = 1:9),
+    hypothesis_map = (; h = 10:18),
+    episodic_memory = [traces; hypotheses],
+    semantic_memory,
+    working_memory = [2],
+)
+n_fails = 0
+semantic_activation = [0.7, 0.3]
+τₛ = 0.3
+idx = 1
+n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
+@test n_fails == 0
+@test τₛ == 0.70
+@test model.working_memory == [1]

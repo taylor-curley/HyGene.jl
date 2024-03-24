@@ -1,4 +1,3 @@
-
 abstract type AbstractHygene end
 
 mutable struct Hygene{
@@ -6,38 +5,38 @@ mutable struct Hygene{
     SM<:AbstractArray,
     WM<:AbstractArray{<:Integer},
     T<:Real,
-    F,
-    R,
+    NPD<:NamedTuple,
+    NPH<:NamedTuple,
 } <: AbstractHygene
 
     t_max::Int
-    focal_similarity::T
-    encoding_fidelity::T
-    threshold::T
-    data_map::Dict{F,R}
-    hypothesis_map::Dict{F,R}
+    κ::Int
+    ρ::T
+    τ::T
+    data_map::NPD
+    hypothesis_map::NPH
     episodic_memory::EM
     semantic_memory::SM
     working_memory::WM
 end
 
 function Hygene(;
-    t_max,
-    focal_similarity,
-    encoding_fidelity,
-    threshold,
+    t_max = 5,
+    κ = 4,
+    ρ = 0.85,
+    τ = 0.21,
     data_map,
     hypothesis_map,
     episodic_memory,
     semantic_memory,
-    working_memory,
+    working_memory = Int[],
 )
 
     return Hygene(
         t_max,
-        focal_similarity,
-        encoding_fidelity,
-        threshold,
+        κ,
+        ρ,
+        τ,
         data_map,
         hypothesis_map,
         episodic_memory,
