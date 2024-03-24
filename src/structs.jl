@@ -1,13 +1,13 @@
-abstract type AbstractHygene end
+abstract type AbstractHyGeneModel end
 
-mutable struct Hygene{
+mutable struct HyGeneModel{
     EM<:AbstractArray,
     SM<:AbstractArray,
     WM<:AbstractArray{<:Integer},
     T<:Real,
     NPD<:NamedTuple,
     NPH<:NamedTuple,
-} <: AbstractHygene
+} <: AbstractHyGeneModel
 
     t_max::Int
     κ::Int
@@ -20,7 +20,7 @@ mutable struct Hygene{
     working_memory::WM
 end
 
-function Hygene(;
+function HyGeneModel(;
     t_max = 5,
     κ = 4,
     ρ = 0.85,
@@ -32,7 +32,7 @@ function Hygene(;
     working_memory = Int[],
 )
 
-    return Hygene(
+    return HyGeneModel(
         t_max,
         κ,
         ρ,

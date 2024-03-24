@@ -112,7 +112,7 @@ function compute_cond_echo_intensities(
     return echo_intensities
 end
 
-function populate_working_memory!(model::AbstractHygene, semantic_activation)
+function populate_working_memory!(model::AbstractHyGeneModel, semantic_activation)
     (; t_max, working_memory) = model
     empty!(working_memory)
     # retrieval failures
@@ -133,7 +133,7 @@ function populate_working_memory!(model::AbstractHygene, semantic_activation)
 end
 
 function update_working_memory!(
-    model::AbstractHygene,
+    model::AbstractHyGeneModel,
     semantic_activation,
     idx,
     n_fails,
@@ -154,7 +154,7 @@ function update_working_memory!(
     return n_fails, τₛ
 end
 
-function judge_hypotheses(model::AbstractHygene, probe)
+function judge_hypotheses(model::AbstractHyGeneModel, probe)
     (; semantic_memory, τ) = model
     d_idx = get_indices(model.data_map)
     h_idx = get_indices(model.hypothesis_map)
@@ -172,7 +172,7 @@ function judge_hypotheses(model::AbstractHygene, probe)
     return judge_posterior(model, echo_intensities)
 end
 
-function judge_hypotheses(model::AbstractHygene, probe, data_components::NamedTuple)
+function judge_hypotheses(model::AbstractHyGeneModel, probe, data_components::NamedTuple)
     # 1. compute activation
     # 2. compute unspecified_probe
     # 3. compute retrieval_probs
@@ -182,7 +182,7 @@ function judge_hypotheses(model::AbstractHygene, probe, data_components::NamedTu
 
 end
 
-function judge_posterior(model::AbstractHygene, echo_intensities)
+function judge_posterior(model::AbstractHyGeneModel, echo_intensities)
     ei = echo_intensities[model.working_memory]
     return ei ./ sum(ei)
 end
