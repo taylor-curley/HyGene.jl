@@ -379,12 +379,12 @@ function trace_decay!(trace::Information, decay::Number)
 end
 function trace_decay!(trace::Trace, decay::Number)
     for info in trace.contents
-        trace_decay!(info, 1.0 - decay)
+        trace_decay!(info, decay)
     end
 end
 function trace_decay!(store::MemoryStore, decay::Number)
     for trace in store.contents
-        trace_decay!(trace, 1.0 - decay)
+        trace_decay!(trace, decay)
     end
 end
 
@@ -613,10 +613,10 @@ function populate_soc!(echo::MemoryTrace, soc::SetofContenders, semantic::Semant
     # Iterate through semantic memory
     while (soc.t < soc.t_max)   # While the model has not hit the threshold
         # Randomly select traces from semantic memory weighted by their activations
-        #sm_item = sample(semantic.contents, Weights(act_weights))
-        sm_item = sample(semantic.contents)
+        sm_item = sample(semantic.contents, Weights(act_weights))
+        #sm_item = sample(semantic.contents)
         # Make sure activation is higher than minimum
-        if (sm_item.A_i > soc.act_min) && (sm_item.A_i > 0.0) && (!isnan(sm_item.A_i))
+        if (sm_item.A_i > soc.act_min) && (!isnan(sm_item.A_i))
             # Make sure item is not already in SOC
             if sm_item.label in [content.label for content in soc.contenders]
                 soc.t += 1
@@ -624,6 +624,7 @@ function populate_soc!(echo::MemoryTrace, soc::SetofContenders, semantic::Semant
                 push!(soc.contenders, deepcopy(sm_item))
                 soc.n_contenders += 1
                 soc.act_min = sm_item.A_i
+                soc.t = 0
             end
         else
             soc.t += 1
@@ -718,6 +719,7 @@ soc_posterior_prob(model::HyGeneModel) =
 """
 function soc_winner(model::HyGeneModel)
     n_contenders = 0
+    # Make sure SoC has contenders
     if model.working_memory.n_contenders > 0
         n_contenders = model.working_memory.n_contenders
         if n_contenders == 1
@@ -730,11 +732,11 @@ function soc_winner(model::HyGeneModel)
             )]
         end
         winner_label = winner.label
-        acc = (obs.label == winner.label) * 1
+    # If SOC is empty, then choose random hypothesis
     else
-        winner = NaN
-        winner_label = NaN
-        acc = 0
+        winner = rand(model.semantic_memory.contents)
+        winner_label = winner.label
     end
+    acc = (obs.label == winner.label) * 1
     return (winner, winner_label, acc)
 end
