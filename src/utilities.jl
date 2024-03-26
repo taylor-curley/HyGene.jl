@@ -238,6 +238,9 @@ function trace_similarity(probe::Vector{<:Number}, trace::Vector{<:Number})
     end
     return (probe'trace) / float(N)
 end
+function trace_similarity(probe::Vector{<:Number}, traces::Vector{<:Vector{<:Number}})
+    return [trace_similarity(probe, trace) for trace in traces]
+end
 
 
 @doc raw"""
@@ -336,6 +339,13 @@ function trace_activation(
     exponent::Integer = 3,
 )
     return trace_similarity(probe, trace)^exponent
+end
+function trace_activation(
+    probe::Vector{<:Number},
+    traces::Vector{<:Vector{<:Number}},
+    exponent::Integer = 3
+)
+    return trace_similarity(probe,traces).^exponent
 end
 function trace_activation(
     probe::HypothesisGeneration,
