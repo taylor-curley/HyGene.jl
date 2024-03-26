@@ -115,7 +115,7 @@ end
     @test retrieval_probs ≈ true_retrieval_probs atol = 1e-4
 end
 
-@safetestset "retreival probabilities" begin
+@safetestset "compute_cond_echo_intensities" begin
     using HyGene
     using Test
     include("example_setup.jl")
@@ -241,5 +241,84 @@ end
         @test τₛ == 0.70
         @test model.working_memory == [1]
     end
+
+    @safetestset "5" begin
+        using HyGene
+        using HyGene: update_working_memory!
+        using Test
+        include("example_setup.jl")
+
+        model = HyGeneModel(;
+            t_max = 5,
+            κ = 1,
+            ρ = 0.85,
+            τ = 0.21,
+            data_map = (; f1 = 1:9),
+            hypothesis_map = (; h = 10:18),
+            episodic_memory = [traces; hypotheses],
+            semantic_memory,
+            working_memory = [2],
+        )
+        n_fails = 1
+        semantic_activation = [0.7, 0.3]
+        τₛ = 0.3
+        idx = 1
+        n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
+        @test n_fails == 0
+        @test τₛ == 0.70
+        @test model.working_memory == [1]
+    end
+
+    @safetestset "6" begin
+        using HyGene
+        using HyGene: update_working_memory!
+        using Test
+        include("example_setup.jl")
+
+        model = HyGeneModel(;
+            t_max = 5,
+            κ = 3,
+            ρ = 0.85,
+            τ = 0.21,
+            data_map = (; f1 = 1:9),
+            hypothesis_map = (; h = 10:18),
+            episodic_memory = [traces; hypotheses],
+            semantic_memory,
+            working_memory = Int[],
+        )
+        n_fails = 0
+        semantic_activation = [0.4, 0.3,.15,.05]
+        τₛ = 0
+        idx = 3
+        n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
+        @test n_fails == 0
+        @test τₛ == .15
+        @test model.working_memory == [3]
+
+        idx = 3
+        n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
+        @test n_fails == 1
+        @test τₛ == .15
+        @test model.working_memory == [3]
+
+        idx = 4
+        n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
+        @test n_fails == 2
+        @test τₛ == .15
+        @test model.working_memory == [3]
+
+        idx = 2
+        n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
+        @test n_fails == 0
+        @test τₛ == .15
+        @test model.working_memory == [3,2]
+
+        idx = 1
+        n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
+        @test n_fails == 0
+        @test τₛ == .15
+        @test model.working_memory == [3,2,1]
+    end
+
 end
 

@@ -1,5 +1,3 @@
-using StatsBase
-
 function compute_similarity(trace::AbstractVector{<:Real}, probe::AbstractVector{<:Real})
     s = 0
     n = 0
@@ -141,14 +139,17 @@ function update_working_memory!(
 )
     (; working_memory, κ, t_max) = model
     act = semantic_activation[idx]
+
     if (idx ∉ working_memory) && (act > τₛ)
         if length(working_memory) == κ
-            _, min_idx = findmin(@view semantic_activation[working_memory])
+            _, min_idx = findmin(semantic_activation[working_memory])
             deleteat!(working_memory, min_idx)
-        end
+        end 
+        n_fails = 0
         push!(working_memory, idx)
-        τₛ = minimum(@view semantic_activation[working_memory])
+        τₛ = minimum(semantic_activation[working_memory])
     else
+        # if already in working memory, or below threshold, then failure
         n_fails += 1
     end
     return n_fails, τₛ
