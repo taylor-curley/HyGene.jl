@@ -132,6 +132,21 @@ function Context(label::Symbol, description::String, n_features::Integer)
     return Context(label, description, n_features, feature_vec, 0.0)
 end
 
+"""
+    Hypothesis
+"""
+@with_kw mutable struct Hypothesis <: Information
+  label::Symbol
+  description::String
+  n_features::Integer
+  contents::AbstractArray
+  A_i::Float64
+end
+function Hypothesis(label::Symbol, description::String, n_features::Integer)
+  feature_vec = create_vec(n_features)
+  return Hypothesis(label, description, n_features, feature_vec, 0.0)
+end
+
 
 """
     MemoryTrace <: Trace
