@@ -24,8 +24,8 @@ end
 function trace_similarity(probe::Vector{<:Number}, trace::Vector{<:Number})
     length(probe) == length(trace) || throw(
         DimensionMismatch(
-            "the lengths of the probe (n=$(length(probe))) and trace (n=$(length(trace))) vectors must be the same!",
-        ),
+        "the lengths of the probe (n=$(length(probe))) and trace (n=$(length(trace))) vectors must be the same!",
+    ),
     )
     N = length(probe)
     for (p, t) in zip(probe, trace)
@@ -62,14 +62,14 @@ function sim_controller(
     L,
     d_obs_sim,
     trace_dists,
-    n_trials,
+    n_trials
 )
     # Create focal hypothesis prototype
     focal_prototype = create_vec(n_features * n_minivecs)
 
     # Replicate focal prototype to create alternative prototypes
     # There should be some similiarity between focal and alt prototypes
-    alt_prototypes = [trace_replication(focal_prototype, S) for _ = 1:(n_hypotheses-1)]
+    alt_prototypes = [trace_replication(focal_prototype, S) for _ = 1:(n_hypotheses - 1)]
 
     # Join prototypes
     prototypes = vcat([focal_prototype], alt_prototypes)
@@ -117,7 +117,7 @@ function sim_controller(
         t = 0
         act_min = 0.0
         act_weights = [trace_activation(echo, trace) for trace in semantic_memory]
-        act_weights[act_weights.<0.0] .= 0.0
+        act_weights[act_weights .< 0.0] .= 0.0
         act_weights = map(x -> isnan(x) ? zero(x) : x, act_weights)
         act_weights ./ sum(act_weights)
         while t < t_max
@@ -154,7 +154,7 @@ results = DataFrame(
     Trial = Number[],
     N_SOC = Number[],
     Winner = Number[],
-    ACC = Number[],
+    ACC = Number[]
 )
 
 for _ = 1:n_participants
@@ -170,7 +170,7 @@ for _ = 1:n_participants
                 L,
                 d_obs_sim,
                 trace_dists,
-                n_trials,
+                n_trials
             )
             results = vcat(results, out)
         end
@@ -180,47 +180,47 @@ end
 sim_avgs = combine(groupby(results, [:S, :L]), [:N_SOC, :ACC] .=> mean)
 
 lay = @layout [a b c d e f]
-a = @df sim_avgs[sim_avgs.L.==0.1, :] plot(
+a = @df sim_avgs[sim_avgs.L .== 0.1, :] plot(
     :S,
     :ACC_mean,
     lims = (0, 1),
     grid = false,
-    title = "L = 0.1",
+    title = "L = 0.1"
 )
-b = @df sim_avgs[sim_avgs.L.==0.3, :] plot(
+b = @df sim_avgs[sim_avgs.L .== 0.3, :] plot(
     :S,
     :ACC_mean,
     lims = (0, 1),
     grid = false,
-    title = "L = 0.3",
+    title = "L = 0.3"
 )
-c = @df sim_avgs[sim_avgs.L.==0.5, :] plot(
+c = @df sim_avgs[sim_avgs.L .== 0.5, :] plot(
     :S,
     :ACC_mean,
     lims = (0, 1),
     grid = false,
-    title = "L = 0.5",
+    title = "L = 0.5"
 )
-d = @df sim_avgs[sim_avgs.L.==0.7, :] plot(
+d = @df sim_avgs[sim_avgs.L .== 0.7, :] plot(
     :S,
     :ACC_mean,
     lims = (0, 1),
     grid = false,
-    title = "L = 0.7",
+    title = "L = 0.7"
 )
-e = @df sim_avgs[sim_avgs.L.==0.9, :] plot(
+e = @df sim_avgs[sim_avgs.L .== 0.9, :] plot(
     :S,
     :ACC_mean,
     lims = (0, 1),
     grid = false,
-    title = "L = 0.9",
+    title = "L = 0.9"
 )
-f = @df sim_avgs[sim_avgs.L.==1.0, :] plot(
+f = @df sim_avgs[sim_avgs.L .== 1.0, :] plot(
     :S,
     :ACC_mean,
     lims = (0, 1),
     grid = false,
-    title = "L = 1.0",
+    title = "L = 1.0"
 )
 plot(
     a,
@@ -232,50 +232,50 @@ plot(
     layout = lay,
     size = (1_200, 300),
     plot_title = "Average Accuracy",
-    xlabel = "S",
+    xlabel = "S"
 )
 
-g = @df sim_avgs[sim_avgs.L.==0.1, :] plot(
+g = @df sim_avgs[sim_avgs.L .== 0.1, :] plot(
     :S,
     :N_SOC_mean,
     ylims = (0, 3),
     grid = false,
-    title = "L = 0.1",
+    title = "L = 0.1"
 )
-h = @df sim_avgs[sim_avgs.L.==0.3, :] plot(
+h = @df sim_avgs[sim_avgs.L .== 0.3, :] plot(
     :S,
     :N_SOC_mean,
     ylims = (0, 3),
     grid = false,
-    title = "L = 0.3",
+    title = "L = 0.3"
 )
-i = @df sim_avgs[sim_avgs.L.==0.5, :] plot(
+i = @df sim_avgs[sim_avgs.L .== 0.5, :] plot(
     :S,
     :N_SOC_mean,
     ylims = (0, 3),
     grid = false,
-    title = "L = 0.5",
+    title = "L = 0.5"
 )
-j = @df sim_avgs[sim_avgs.L.==0.7, :] plot(
+j = @df sim_avgs[sim_avgs.L .== 0.7, :] plot(
     :S,
     :N_SOC_mean,
     ylims = (0, 3),
     grid = false,
-    title = "L = 0.7",
+    title = "L = 0.7"
 )
-k = @df sim_avgs[sim_avgs.L.==0.9, :] plot(
+k = @df sim_avgs[sim_avgs.L .== 0.9, :] plot(
     :S,
     :N_SOC_mean,
     ylims = (0, 3),
     grid = false,
-    title = "L = 0.9",
+    title = "L = 0.9"
 )
-l = @df sim_avgs[sim_avgs.L.==1.0, :] plot(
+l = @df sim_avgs[sim_avgs.L .== 1.0, :] plot(
     :S,
     :N_SOC_mean,
     ylims = (0, 3),
     grid = false,
-    title = "L = 1.0",
+    title = "L = 1.0"
 )
 plot(
     g,
@@ -287,5 +287,5 @@ plot(
     layout = lay,
     size = (1_200, 300),
     plot_title = "Number of Contenders",
-    xlabel = "S",
+    xlabel = "S"
 )

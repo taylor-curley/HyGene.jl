@@ -29,7 +29,7 @@ context_labels = [
     :symptom_6,
     :symptom_7,
     :symptom_8,
-    :symptom_9,
+    :symptom_9
 ]
 
 # Define 8 hypotheses with unique labels. The alt hypotheses should have
@@ -60,7 +60,7 @@ sim_1_results = DataFrame(
     probe_type = Symbol[],
     n_contenders = Integer[],
     recalled_type = Any[],
-    ACC = Integer[],
+    ACC = Integer[]
 )
 
 # Iterate through parameter sets
@@ -77,7 +77,7 @@ for S in focal_sim
                 t_max,
                 n_features,
                 S,
-                L,
+                L
             )
             for j = 1:n_trials
                 # Randomly select hypothesis and generate trace
@@ -102,7 +102,7 @@ for S in focal_sim
                     else
                         post_prob = soc_posterior_prob(
                             sim_mod.working_memory,
-                            sim_mod.long_term_memory,
+                            sim_mod.long_term_memory
                         )
                         winner = sim_mod.working_memory.contenders[argmax(
                             getfield.(sim_mod.working_memory.contenders, :A_i),
@@ -127,7 +127,7 @@ for S in focal_sim
                     obs.label,
                     n_contenders,
                     winner_label,
-                    acc,
+                    acc
                 ]
                 push!(sim_1_results, out)
                 next!(p)
@@ -137,17 +137,17 @@ for S in focal_sim
 end
 # Recode probe type
 sim_1_results.probe_type_2 .= :focal
-sim_1_results.probe_type_2[sim_1_results.probe_type.!=:focal] .= :alt
+sim_1_results.probe_type_2[sim_1_results.probe_type .!= :focal] .= :alt
 
 # Calculate average n_contenders by probe type, S, and L
 sim_1_avg = combine(
     groupby(sim_1_results, [:probe_type_2, :focal_sim, :encode_fidelity]),
-    [:n_contenders, :ACC] .=> mean,
+    [:n_contenders, :ACC] .=> mean
 )
 
 # Average accuracy
 lay = @layout [a b c d e f]
-a = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.1, :] plot(
+a = @df sim_1_avg[sim_1_avg.encode_fidelity .== 0.1, :] plot(
     :focal_sim,
     :ACC_mean,
     groups = :probe_type_2,
@@ -155,9 +155,9 @@ a = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.1, :] plot(
     grid = false,
     title = "L = 0.1",
     left_margin = 0 * Plots.mm,
-    right_margin = -6 * Plots.mm,
+    right_margin = -6 * Plots.mm
 )
-b = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.3, :] plot(
+b = @df sim_1_avg[sim_1_avg.encode_fidelity .== 0.3, :] plot(
     :focal_sim,
     :ACC_mean,
     groups = :probe_type_2,
@@ -167,9 +167,9 @@ b = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.3, :] plot(
     showaxis = :x,
     title = "L = 0.3",
     left_margin = 0 * Plots.mm,
-    right_margin = -6 * Plots.mm,
+    right_margin = -6 * Plots.mm
 )
-c = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.5, :] plot(
+c = @df sim_1_avg[sim_1_avg.encode_fidelity .== 0.5, :] plot(
     :focal_sim,
     :ACC_mean,
     groups = :probe_type_2,
@@ -179,9 +179,9 @@ c = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.5, :] plot(
     showaxis = :x,
     title = "L = 0.5",
     left_margin = 0 * Plots.mm,
-    right_margin = -6 * Plots.mm,
+    right_margin = -6 * Plots.mm
 )
-d = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.7, :] plot(
+d = @df sim_1_avg[sim_1_avg.encode_fidelity .== 0.7, :] plot(
     :focal_sim,
     :ACC_mean,
     groups = :probe_type_2,
@@ -191,9 +191,9 @@ d = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.7, :] plot(
     showaxis = :x,
     title = "L = 0.7",
     left_margin = 0 * Plots.mm,
-    right_margin = -6 * Plots.mm,
+    right_margin = -6 * Plots.mm
 )
-e = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.9, :] plot(
+e = @df sim_1_avg[sim_1_avg.encode_fidelity .== 0.9, :] plot(
     :focal_sim,
     :ACC_mean,
     groups = :probe_type_2,
@@ -203,9 +203,9 @@ e = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.9, :] plot(
     showaxis = :x,
     title = "L = 0.9",
     left_margin = 0 * Plots.mm,
-    right_margin = -6 * Plots.mm,
+    right_margin = -6 * Plots.mm
 )
-f = @df sim_1_avg[sim_1_avg.encode_fidelity.==1.0, :] plot(
+f = @df sim_1_avg[sim_1_avg.encode_fidelity .== 1.0, :] plot(
     :focal_sim,
     :ACC_mean,
     groups = :probe_type_2,
@@ -214,7 +214,7 @@ f = @df sim_1_avg[sim_1_avg.encode_fidelity.==1.0, :] plot(
     label = false,
     showaxis = :x,
     title = "L = 1.0",
-    left_margin = 0 * Plots.mm,
+    left_margin = 0 * Plots.mm
 )
 plot(
     a,
@@ -226,11 +226,11 @@ plot(
     layout = lay,
     size = (1_200, 400),
     plot_title = "Average Accuracy",
-    xlabel = "S",
+    xlabel = "S"
 )
 
 # Average SOC n
-g = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.1, :] plot(
+g = @df sim_1_avg[sim_1_avg.encode_fidelity .== 0.1, :] plot(
     :focal_sim,
     :n_contenders_mean,
     groups = :probe_type_2,
@@ -238,9 +238,9 @@ g = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.1, :] plot(
     grid = false,
     title = "L = 0.1",
     left_margin = 0 * Plots.mm,
-    right_margin = -6 * Plots.mm,
+    right_margin = -6 * Plots.mm
 )
-h = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.3, :] plot(
+h = @df sim_1_avg[sim_1_avg.encode_fidelity .== 0.3, :] plot(
     :focal_sim,
     :n_contenders_mean,
     groups = :probe_type_2,
@@ -250,9 +250,9 @@ h = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.3, :] plot(
     showaxis = :x,
     title = "L = 0.3",
     left_margin = 0 * Plots.mm,
-    right_margin = -6 * Plots.mm,
+    right_margin = -6 * Plots.mm
 )
-i = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.5, :] plot(
+i = @df sim_1_avg[sim_1_avg.encode_fidelity .== 0.5, :] plot(
     :focal_sim,
     :n_contenders_mean,
     groups = :probe_type_2,
@@ -262,9 +262,9 @@ i = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.5, :] plot(
     showaxis = :x,
     title = "L = 0.5",
     left_margin = 0 * Plots.mm,
-    right_margin = -6 * Plots.mm,
+    right_margin = -6 * Plots.mm
 )
-j = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.7, :] plot(
+j = @df sim_1_avg[sim_1_avg.encode_fidelity .== 0.7, :] plot(
     :focal_sim,
     :n_contenders_mean,
     groups = :probe_type_2,
@@ -274,9 +274,9 @@ j = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.7, :] plot(
     showaxis = :x,
     title = "L = 0.7",
     left_margin = 0 * Plots.mm,
-    right_margin = -6 * Plots.mm,
+    right_margin = -6 * Plots.mm
 )
-k = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.9, :] plot(
+k = @df sim_1_avg[sim_1_avg.encode_fidelity .== 0.9, :] plot(
     :focal_sim,
     :n_contenders_mean,
     groups = :probe_type_2,
@@ -286,9 +286,9 @@ k = @df sim_1_avg[sim_1_avg.encode_fidelity.==0.9, :] plot(
     showaxis = :x,
     title = "L = 0.9",
     left_margin = 0 * Plots.mm,
-    right_margin = -6 * Plots.mm,
+    right_margin = -6 * Plots.mm
 )
-l = @df sim_1_avg[sim_1_avg.encode_fidelity.==1.0, :] plot(
+l = @df sim_1_avg[sim_1_avg.encode_fidelity .== 1.0, :] plot(
     :focal_sim,
     :n_contenders_mean,
     groups = :probe_type_2,
@@ -297,7 +297,7 @@ l = @df sim_1_avg[sim_1_avg.encode_fidelity.==1.0, :] plot(
     label = false,
     showaxis = :x,
     title = "L = 1.0",
-    left_margin = 0 * Plots.mm,
+    left_margin = 0 * Plots.mm
 )
 plot(
     g,
@@ -309,9 +309,5 @@ plot(
     layout = lay,
     size = (1_200, 400),
     plot_title = "Number of Contenders",
-    xlabel = "S",
+    xlabel = "S"
 )
-
-
-# sim_mod =
-#     HyGeneModel(context_labels, hypothesis_labels, n_traces, 0.4, 10, n_features, 0.5, 0.4)

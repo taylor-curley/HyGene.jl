@@ -74,7 +74,7 @@ end
         1.0,
         -1.0,
         1.0,
-        0.0,
+        0.0
     ]
 
     @test unspecified_probe ≈ true_unspecified_probe atol = 1e-2
@@ -131,7 +131,6 @@ end
     @test echo_intensities ≈ [0.742, 0.196, 0.3548] atol = 1e-3
 end
 
-
 @safetestset "update_working_memory!" begin
     @safetestset "1" begin
         using HyGene
@@ -148,7 +147,7 @@ end
             hypothesis_map = (; h = 10:18),
             episodic_memory = [traces; hypotheses],
             semantic_memory,
-            working_memory = Int[],
+            working_memory = Int[]
         )
 
         n_fails = 0
@@ -176,7 +175,7 @@ end
             hypothesis_map = (; h = 10:18),
             episodic_memory = [traces; hypotheses],
             semantic_memory,
-            working_memory = [2],
+            working_memory = [2]
         )
         n_fails = 0
         semantic_activation = [0.7, 0.3]
@@ -203,7 +202,7 @@ end
             hypothesis_map = (; h = 10:18),
             episodic_memory = [traces; hypotheses],
             semantic_memory,
-            working_memory = [2],
+            working_memory = [2]
         )
         n_fails = 0
         semantic_activation = [0.7, 0.3]
@@ -230,7 +229,7 @@ end
             hypothesis_map = (; h = 10:18),
             episodic_memory = [traces; hypotheses],
             semantic_memory,
-            working_memory = [2],
+            working_memory = [2]
         )
         n_fails = 0
         semantic_activation = [0.7, 0.3]
@@ -257,7 +256,7 @@ end
             hypothesis_map = (; h = 10:18),
             episodic_memory = [traces; hypotheses],
             semantic_memory,
-            working_memory = [2],
+            working_memory = [2]
         )
         n_fails = 1
         semantic_activation = [0.7, 0.3]
@@ -284,41 +283,39 @@ end
             hypothesis_map = (; h = 10:18),
             episodic_memory = [traces; hypotheses],
             semantic_memory,
-            working_memory = Int[],
+            working_memory = Int[]
         )
         n_fails = 0
-        semantic_activation = [0.4, 0.3,.15,.05]
+        semantic_activation = [0.4, 0.3, 0.15, 0.05]
         τₛ = 0
         idx = 3
         n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
         @test n_fails == 0
-        @test τₛ == .15
+        @test τₛ == 0.15
         @test model.working_memory == [3]
 
         idx = 3
         n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
         @test n_fails == 1
-        @test τₛ == .15
+        @test τₛ == 0.15
         @test model.working_memory == [3]
 
         idx = 4
         n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
         @test n_fails == 2
-        @test τₛ == .15
+        @test τₛ == 0.15
         @test model.working_memory == [3]
 
         idx = 2
         n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
         @test n_fails == 0
-        @test τₛ == .15
-        @test model.working_memory == [3,2]
+        @test τₛ == 0.15
+        @test model.working_memory == [3, 2]
 
         idx = 1
         n_fails, τₛ = update_working_memory!(model, semantic_activation, idx, n_fails, τₛ)
         @test n_fails == 0
-        @test τₛ == .15
-        @test model.working_memory == [3,2,1]
+        @test τₛ == 0.15
+        @test model.working_memory == [3, 2, 1]
     end
-
 end
-
