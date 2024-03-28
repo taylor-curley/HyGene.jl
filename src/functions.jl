@@ -333,10 +333,52 @@ end
     judge_hypothesis(
         model::AbstractHyGeneModel,
         probe::AbstractVector{<:Real},
-        hypothesis_idx
+        hypothesis_idx,
+        data_map::NamedTuple
     )
 
 Judge the posterior probability of the hypotheses associated with `hypothesis_idx`. 
+
+# Arguments
+
+- `model::AbstractHyGeneModel`: an HyGene model which is a subtype of `AbstractHyGeneModel`
+- `probe::AbstractVector{<:Real}`: typically a the hypothesis component of a semantic trace, which is used to probe the hypothesis components of traces in episodic 
+    memory
+- `hypothesis_idx`: index of the judged hypothesis
+- `data_map::NamedTuple`: specifies the column indices of the data component to be used. As an example, a subset of the full index set might be 
+    specified when symptoms or other data are aquired sequentially.  
+"""
+function judge_hypothesis(
+    model::AbstractHyGeneModel,
+    probe::AbstractVector{<:Real},
+    hypothesis_idx,
+    data_map::NamedTuple
+)
+    (; semantic_memory, τ) = model
+    d_idx = get_indices(data_map)
+    h_idx = get_indices(model.hypothesis_map)
+    data_traces = @view model.episodic_memory[d_idx, :]
+    semantic_probes = @view model.semantic_memory[h_idx, :]
+    hypothesis_traces = @view model.episodic_memory[h_idx, :]
+    activations = compute_activations(data_traces, probe)
+    unspecified_probe =
+        create_unspecified_probe(activations, data_traces, hypothesis_traces, τ)
+    semantic_activation = compute_activations(semantic_memory, unspecified_probe)
+    echo_intensities =
+        compute_cond_echo_intensities(activations, hypothesis_traces, semantic_probes, τ)
+    populate_working_memory!(model, echo_intensities)
+    return judge_posterior(model, echo_intensities, hypothesis_idx)
+end
+
+"""
+    judge_hypothesis(
+        model::AbstractHyGeneModel,
+        probe::AbstractVector{<:Real},
+        hypothesis_idx
+    )
+
+Judge the posterior probability of the hypotheses associated with `hypothesis_idx`. Note this method uses the entire 
+range of indices for the data component, as defined in `data_map` of the model object. 
 
 # Arguments
 
@@ -350,20 +392,7 @@ function judge_hypothesis(
     probe::AbstractVector{<:Real},
     hypothesis_idx
 )
-    (; semantic_memory, τ) = model
-    d_idx = get_indices(model.data_map)
-    h_idx = get_indices(model.hypothesis_map)
-    data_traces = @view model.episodic_memory[d_idx, :]
-    semantic_probes = @view model.semantic_memory[h_idx, :]
-    hypothesis_traces = @view model.episodic_memory[h_idx, :]
-    activations = compute_activations(data_traces, probe)
-    unspecified_probe =
-        create_unspecified_probe(activations, data_traces, hypothesis_traces, τ)
-    semantic_activation = compute_activations(semantic_memory, unspecified_probe)
-    echo_intensities =
-        compute_cond_echo_intensities(activations, hypothesis_traces, semantic_probes, τ)
-    populate_working_memory!(model, echo_intensities)
-    return judge_posterior(model, echo_intensities, hypothesis_idx)
+    return judge_hypothesis(model, probe, hypothesis_idx, model.data_map)
 end
 
 function judge_posterior(model::AbstractHyGeneModel, echo_intensities, hypothesis_idx)

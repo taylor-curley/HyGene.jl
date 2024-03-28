@@ -38,4 +38,6 @@ model = HyGeneModel(;
 @show judge_hypothesis(model, probe, 1)
 @show model.working_memory;
 
-@benchmark judge_hypothesis($model, $probe, 1)
+@benchmark judge_hypothesis($model, $probe, $1)
+
+@benchmark replicate_traces($semantic_memory, $n_reps, $0.85)
