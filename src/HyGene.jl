@@ -1,5 +1,6 @@
 module HyGene
 
+using PrettyTables
 using StatsBase
 
 export AbstractHyGeneModel
