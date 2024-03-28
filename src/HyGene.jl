@@ -12,7 +12,10 @@ export compute_cond_echo_intensities
 export create_unspecified_probe
 export judge_hypotheses
 export judge_posterior
+export make_traces
 export populate_working_memory!
+export replicate_trace
+export replicate_traces
 
 include("structs.jl")
 include("functions.jl")

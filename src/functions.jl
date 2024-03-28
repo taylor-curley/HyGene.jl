@@ -247,12 +247,14 @@ is cleared before semantic traces are added.
 # Arguments 
 
 - `model::AbstractHyGeneModel`: an HyGene model which is a subtype of `AbstractHyGeneModel`
-- `probe::AbstractVector{<:Real}`: a vector representing a memory cue
+- `semantic_activations::AbstractVector{<:Real}`: activation values corresponding to semantic traces
 """
 function populate_working_memory!(
     model::AbstractHyGeneModel,
     semantic_activations::AbstractVector{<:Real}
 )
+    # handle case in which all activation values are below threshold 
+    all(a -> a == 0, semantic_activations) ? (return nothing) : nothing
     (; t_max, working_memory) = model
     empty!(working_memory)
     # retrieval failures
@@ -272,24 +274,54 @@ function populate_working_memory!(
     return nothing
 end
 
+"""
+    update_working_memory!(
+        model::AbstractHyGeneModel,
+        semantic_activations::AbstractArray{<:Real},
+        idx::Integer,
+        n_fails::Integer,
+        τₛ::Real
+    )
+
+Adds the hypothesis associated with index `idx` under the following conditions:
+
+1. hypothesis `idx` is not in working memory 
+2. the semantic activation associated with hypothesis `idx` is greater than `τₛ`
+
+Additionally, the function updates the number of consecutive retrieval failures `n_fails` and the 
+dynamic sematic retrieval threshold, which is the minimum activation of hypotheses in working memory. 
+
+# Arguments
+
+- `model::AbstractHyGeneModel`: an HyGene model which is a subtype of `AbstractHyGeneModel`
+- `semantic_activations::AbstractArray{<:Real}`: activation values corresponding to semantic traces
+- `idx::Integer`: index of the candidate hypothesis to potentially be added to working memory
+- `n_fails::Integer`: count of consecutive retrieval failures 
+- `τₛ::Real`: dynamic semantic retrieval threshold 
+
+# Returns 
+
+- `n_fails, τₛ`: a count of consecutive retrieval failures and the dynamic sematic retrieval threshold 
+"""
 function update_working_memory!(
     model::AbstractHyGeneModel,
-    semantic_activations,
-    idx,
-    n_fails,
-    τₛ
+    semantic_activations::AbstractArray{<:Real},
+    idx::Integer,
+    n_fails::Integer,
+    τₛ::Real
 )
     (; working_memory, κ, t_max) = model
+    # activation of candidate hypothesis
     act = semantic_activations[idx]
 
     if (idx ∉ working_memory) && (act > τₛ)
         if length(working_memory) == κ
-            _, min_idx = findmin(semantic_activations[working_memory])
+            _, min_idx = get_min_activation(semantic_activations, working_memory)
             deleteat!(working_memory, min_idx)
         end
         n_fails = 0
         push!(working_memory, idx)
-        τₛ = minimum(semantic_activations[working_memory])
+        τₛ, _ = get_min_activation(semantic_activations, working_memory)
     else
         # if already in working memory, or below threshold, then failure
         n_fails += 1
@@ -308,7 +340,6 @@ function judge_hypotheses(model::AbstractHyGeneModel, probe)
     unspecified_probe =
         create_unspecified_probe(activations, data_traces, hypothesis_traces, τ)
     semantic_activation = compute_activations(semantic_memory, unspecified_probe)
-    retrieval_probs = normalize(semantic_activation)
     echo_intensities =
         compute_cond_echo_intensities(activations, hypothesis_traces, semantic_probes, τ)
     populate_working_memory!(model, echo_intensities)
@@ -327,4 +358,17 @@ end
 function judge_posterior(model::AbstractHyGeneModel, echo_intensities)
     ei = echo_intensities[model.working_memory]
     return ei ./ sum(ei)
+end
+
+function get_min_activation(activations::AbstractVector{<:T}, indices) where {T <: Real}
+    min_val = typemax(T)
+    min_idx = 0
+    for i ∈ 1:length(indices)
+        idx = indices[i]
+        if activations[idx] < min_val
+            min_val = activations[idx]
+            min_idx = i
+        end
+    end
+    return min_val, min_idx
 end
