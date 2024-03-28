@@ -339,7 +339,7 @@ end
             working_memory = Int[]
         )
 
-        semantic_activation = [0,0]
+        semantic_activation = [0, 0]
         populate_working_memory!(model, semantic_activation)
         @test isempty(model.working_memory)
     end
@@ -362,7 +362,7 @@ end
             working_memory = Int[]
         )
 
-        semantic_activation = [1,0]
+        semantic_activation = [1, 0]
         populate_working_memory!(model, semantic_activation)
         @test model.working_memory == [1]
     end
@@ -370,7 +370,7 @@ end
     @safetestset "2" begin
         using HyGene
         using HyGene: populate_working_memory!
-        using Random 
+        using Random
         using Statistics
         using Test
         include("example_setup.jl")
@@ -389,83 +389,100 @@ end
             working_memory = Int[]
         )
 
-        semantic_activation = [1.0,0.0,1.0]
+        semantic_activation = [1.0, 0.0, 1.0]
         results = fill(0, 1000)
         for i ∈ 1:1000
             populate_working_memory!(model, semantic_activation)
             @test length(model.working_memory) == 1
             results[i] = model.working_memory[1]
         end
-        @test mean(results .== 1) ≈ .50 atol = .03
+        @test mean(results .== 1) ≈ 0.50 atol = 0.03
     end
 end
 
 @safetestset "replicate_trace" begin
     @safetestset "replicate_trace" begin
         using HyGene
-        using Random 
+        using Random
         using Statistics
         using Test
-    
+
         Random.seed!(62)
-    
+
         trace = make_traces(100_000)
         # encoding fidelity
         ρ = 0.0
         new_trace = replicate_trace(trace, ρ)
         # 1/3 chance a feature in trace is zero
         # all features in new_trace are zero 
-        @test 1/3 ≈ mean(trace .== new_trace) atol = .01
+        @test 1 / 3 ≈ mean(trace .== new_trace) atol = 0.01
     end
 
     @safetestset "replicate_trace" begin
         using HyGene
-        using Random 
+        using Random
         using Statistics
         using Test
-    
+
         Random.seed!(62)
-    
+
         trace = make_traces(100_000)
         # encoding fidelity
-        ρ = .85
+        ρ = 0.85
         new_trace = replicate_trace(trace, ρ)
         non_zero_idx = trace .≠ 0
-        @test ρ ≈ mean(trace[non_zero_idx] .== new_trace[non_zero_idx]) atol = .005
-        @test 2/3 ≈ mean(non_zero_idx) atol = .005
+        @test ρ ≈ mean(trace[non_zero_idx] .== new_trace[non_zero_idx]) atol = 0.005
+        @test 2 / 3 ≈ mean(non_zero_idx) atol = 0.005
     end
+end
+
+@safetestset "replicate_traces" begin
+    using HyGene
+    using Test
+
+    # encoding fidelity
+    ρ = 1.0
+    traces = make_traces(10, 5)
+    n_reps = [1, 1, 1, 1, 2]
+    new_traces = replicate_traces(traces, n_reps, ρ)
+
+    @test size(new_traces) == (10, sum(n_reps))
+    for i ∈ 1:size(traces, 2)
+        @test traces[i] == new_traces[i]
+    end
+    @test traces[end] == traces[end]
 end
 
 @safetestset "encode" begin
     @safetestset "1" begin
         using HyGene
         using HyGene: encode
-        using Random 
+        using Random
         using Statistics
         using Test
-    
+
         Random.seed!(3323)
-    
+
         # encoding fidelity
-        ρ = .85
+        ρ = 0.85
         encodings = [encode(1, ρ) for _ ∈ 1:100_000]
-      
-        @test ρ ≈ mean(encodings .== 1) atol = .005
+
+        @test ρ ≈ mean(encodings .== 1) atol = 0.005
     end
 
     @safetestset "2" begin
         using HyGene
         using HyGene: encode
-        using Random 
+        using Random
         using Statistics
         using Test
-    
+
         Random.seed!(414)
-    
+
         # encoding fidelity
-        ρ = .85
+        ρ = 0.85
         encodings = [encode(0, ρ) for _ ∈ 1:100_000]
-      
+
         @test 1 == mean(encodings .== 0)
     end
 end

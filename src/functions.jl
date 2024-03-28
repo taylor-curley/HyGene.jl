@@ -329,7 +329,27 @@ function update_working_memory!(
     return n_fails, τₛ
 end
 
-function judge_hypotheses(model::AbstractHyGeneModel, probe)
+"""
+    judge_hypothesis(
+        model::AbstractHyGeneModel,
+        probe::AbstractVector{<:Real},
+        hypothesis_idx
+    )
+
+Judge the posterior probability of the hypotheses associated with `hypothesis_idx`. 
+
+# Arguments
+
+- `model::AbstractHyGeneModel`: an HyGene model which is a subtype of `AbstractHyGeneModel`
+- `probe::AbstractVector{<:Real}`: typically a the hypothesis component of a semantic trace, which is used to probe the hypothesis components of traces in episodic 
+    memory
+- `hypothesis_idx`: index of the judged hypothesis
+"""
+function judge_hypothesis(
+    model::AbstractHyGeneModel,
+    probe::AbstractVector{<:Real},
+    hypothesis_idx
+)
     (; semantic_memory, τ) = model
     d_idx = get_indices(model.data_map)
     h_idx = get_indices(model.hypothesis_map)
@@ -343,21 +363,15 @@ function judge_hypotheses(model::AbstractHyGeneModel, probe)
     echo_intensities =
         compute_cond_echo_intensities(activations, hypothesis_traces, semantic_probes, τ)
     populate_working_memory!(model, echo_intensities)
-    return judge_posterior(model, echo_intensities)
+    return judge_posterior(model, echo_intensities, hypothesis_idx)
 end
 
-function judge_hypotheses(model::AbstractHyGeneModel, probe, data_components::NamedTuple)
-    # 1. compute activation
-    # 2. compute unspecified_probe
-    # 3. compute retrieval_probs
-    # 4. populate working memory 
-    # 5. judge posterior probabilities
-
-end
-
-function judge_posterior(model::AbstractHyGeneModel, echo_intensities)
+function judge_posterior(model::AbstractHyGeneModel, echo_intensities, hypothesis_idx)
+    if hypothesis_idx ∉ model.working_memory
+        return 0.0
+    end
     ei = echo_intensities[model.working_memory]
-    return ei ./ sum(ei)
+    return ei[hypothesis_idx] ./ sum(ei)
 end
 
 function get_min_activation(activations::AbstractVector{<:T}, indices) where {T <: Real}
