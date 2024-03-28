@@ -89,8 +89,10 @@ end
 function Base.show(io::IO, ::MIME"text/plain", model::AbstractHyGeneModel)
     values = [getfield(model, f) for f in fieldnames(typeof(model))]
     values = map(v -> typeof(v) == Bool ? string(v) : v, values)
-    dimensions = [fill("", 6)..., "features: $(size(values[7], 1)) traces: $(size(values[7], 2))",
-    "features: $(size(values[8], 1)) traces: $(size(values[8], 2))", "hypotheses: $(length(values[9]))"]
+    dimensions =
+        [fill("", 6)..., "features: $(size(values[7], 1)) traces: $(size(values[7], 2))",
+            "features: $(size(values[8], 1)) traces: $(size(values[8], 2))",
+            "hypotheses: $(length(values[9]))"]
     T = typeof(model)
     model_name = string(T.name.name)
     return pretty_table(
@@ -99,7 +101,7 @@ function Base.show(io::IO, ::MIME"text/plain", model::AbstractHyGeneModel)
         title = model_name,
         row_label_column_title = "Field",
         compact_printing = false,
-        header = ["Value","Dimensions"],
+        header = ["Value", "Dimensions"],
         row_label_alignment = :l,
         row_labels = [fieldnames(typeof(model))...],
         formatters = ft_printf("%5.2f"),
