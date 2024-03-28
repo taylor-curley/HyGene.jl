@@ -1,24 +1,23 @@
 module HyGene
 
-# Import external libraries
-using Distributions, Parameters, StatsBase
+using StatsBase
 
-# Structure exports
-export HypothesisGeneration, Model, MemoryStore, Trace, Information, ObsTrace
-export Context, MemoryTrace, LongTermMemory, SemanticMemory
-export SetofContenders, HyGeneModel
-include("./structures.jl")
+export AbstractHyGeneModel
+export HyGeneModel
 
-# Utility exports
-export create_vec, trace_replication, trace_activation
-export trace_similarity, trace_decay!, bounce_memory!
-export clear_content!, standardize_trace!, echo_content
-export populate_soc!, cond_echo_intensity, soc_posterior_prob
-export soc_winner
-include("./utilities.jl")
+export compute_activations
+export compute_cond_echo_content
+export compute_cond_echo_intensity
+export compute_cond_echo_intensities
+export create_unspecified_probe
+export judge_hypothesis
+export judge_posterior
+export make_traces
+export populate_working_memory!
+export replicate_trace
+export replicate_traces
 
-# Simulation controller exports
-export create_prototypes, create_traces, create_observation, create_labels
-include("./sim_controller.jl")
-
+include("structs.jl")
+include("functions.jl")
+include("utilities.jl")
 end

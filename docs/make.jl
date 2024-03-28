@@ -10,9 +10,9 @@ makedocs(
             "Structures" => "structs.md",
             "Constructors" => "constrs.md",
             "Simulation Controllers" => "sim_controller.md",
-            "General Functions" => "functs.md",
-        ],
-    ],
+            "General Functions" => "functs.md"
+        ]
+    ]
 )
 
 # deploydocs(
