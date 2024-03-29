@@ -55,7 +55,6 @@ soc_posterior_prob(soc, ltm)
 
 echo2 = echo_content(observation2, ltm)
 
-
 using Random;
 Random.seed!(25);
 context_a = Context(:a, "this is context a", 10);
