@@ -1,7 +1,7 @@
 name = "HyGene"
 uuid = "61404a0b-ff3e-4699-bca4-612108404933"
 authors = ["taylor-curley <tmc2737@gmail.com> and contributors"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
