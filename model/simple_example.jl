@@ -10,11 +10,11 @@ using Random
 Random.seed!(8741)
 n_features = 200
 n_reps = fill(50, 6)
-focal_protype = make_traces(n_features)
+focal_prototype = make_traces(n_features)
 alt_prototypes = make_traces(n_features, 5)
-semantic_memory = hcat(focal_protype, alt_prototypes)
+semantic_memory = hcat(focal_prototype, alt_prototypes)
 episodic_memory = replicate_traces(semantic_memory, n_reps, 0.85)
-probe = replicate_trace(focal_protype[1:100], 0.85)
+probe = replicate_trace(focal_prototype[1:100], 0.85)
 
 model = HyGeneModel(;
     # maximum consecutive retrieval failures 
